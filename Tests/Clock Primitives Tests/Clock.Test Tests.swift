@@ -439,7 +439,7 @@ extension Clock.Test.Test.Integration {
             let clock: Clock.Test
             let deadline: Clock.Test.Instant
             let completed: Locked<Int>
-            let stopHammering: Locked<Bool>
+            let shouldStopHammering: Locked<Bool>
         }
 
         let allRounds = (0..<rounds).map { _ in
@@ -447,7 +447,7 @@ extension Clock.Test.Test.Integration {
                 clock: Clock.Test(),
                 deadline: Clock.Test.Instant(offset: .milliseconds(1)),
                 completed: Locked<Int>(initialState: 0),
-                stopHammering: Locked<Bool>(initialState: false)
+                shouldStopHammering: Locked<Bool>(initialState: false)
             )
         }
 
@@ -455,7 +455,7 @@ extension Clock.Test.Test.Integration {
             for _ in 0..<hammerTasksPerRound {
                 Task.detached {
                     var iteration = 0
-                    while !round.stopHammering.withLock({ $0 }) {
+                    while !round.shouldStopHammering.withLock({ $0 }) {
                         round.clock.advance(to: round.deadline)
                         iteration += 1
                         if iteration % 64 == 0 { await Task.yield() }
@@ -481,7 +481,7 @@ extension Clock.Test.Test.Integration {
             try? await Task.sleep(for: .milliseconds(5))
         }
         for round in allRounds {
-            round.stopHammering.withLock { $0 = true }
+            round.shouldStopHammering.withLock { $0 = true }
         }
 
         if !allWoke {
