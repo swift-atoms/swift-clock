@@ -50,7 +50,6 @@ extension Clock.Nanoseconds {
         // `Swift.Duration.nanoseconds(_:)`. The wrapper IS the
         // implementation of this primitive operation; no typed
         // difference accessor exists at this layer.
-        // swiftlint:disable:next bitpattern_rawvalue_chain_anti_pattern
         let diff = Int64(bitPattern: other.rawValue &- rawValue)
         return .nanoseconds(diff)
     }
