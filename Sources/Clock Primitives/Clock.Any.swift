@@ -37,7 +37,8 @@
         /// let clock: Clock.`Any`<Duration> = Clock.`Any`(ContinuousClock())
         /// try await clock.sleep(for: .seconds(1))
         /// ```
-        public struct `Any`<D: DurationProtocol & Hashable>: _Concurrency.Clock, @unchecked Sendable {
+        public struct `Any`<D: DurationProtocol & Hashable>: _Concurrency.Clock, @unchecked Sendable
+        {
             /// The type-erased instant of the wrapped clock.
             public struct Instant: InstantProtocol, Sendable {
                 fileprivate let _box: Box
@@ -59,7 +60,8 @@
             /// Creates a type-erased clock from a concrete clock.
             ///
             /// - Parameter clock: The clock to wrap.
-            public init<C: _Concurrency.Clock>(_ clock: C) where C.Duration == D, C: Sendable, C.Instant: Sendable {
+            public init<C: _Concurrency.Clock>(_ clock: C)
+            where C.Duration == D, C: Sendable, C.Instant: Sendable {
                 self._now = {
                     Instant(_box: ConcreteBox(clock.now))
                 }

@@ -175,7 +175,8 @@
             // overload with identical semantics on both toolchains.
             await withTaskCancellationHandler(
                 operation: {
-                    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                    await withCheckedContinuation {
+                        (continuation: CheckedContinuation<Void, Never>) in
                         let resumeImmediately = state.withLock { st -> Bool in
                             guard !Task.isCancelled, st.now < deadline else { return true }
                             st.suspensions.append(
