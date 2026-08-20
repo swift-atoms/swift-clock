@@ -1,15 +1,15 @@
-// swift-tools-version: 6.3.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
 let package = Package(
     name: "swift-clock-primitives",
     platforms: [
-        .macOS("27"),
-        .iOS("27"),
-        .tvOS("27"),
-        .watchOS("27"),
-        .visionOS("27")
+        .macOS(.v27),
+        .iOS(.v27),
+        .tvOS(.v27),
+        .watchOS(.v27),
+        .visionOS(.v27),
     ],
     products: [
         .library(
@@ -22,9 +22,18 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-primitives/swift-tagged-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-carrier-primitives.git", branch: "main"),
-        .package(url: "https://github.com/swift-primitives/swift-standard-library-extensions.git", branch: "main"),
+        .package(
+            url: "https://github.com/swift-primitives/swift-tagged-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-carrier-primitives.git",
+            branch: "main"
+        ),
+        .package(
+            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+            branch: "main"
+        ),
     ],
     targets: [
         .target(
@@ -32,14 +41,20 @@ let package = Package(
             dependencies: [
                 .product(name: "Tagged Primitives", package: "swift-tagged-primitives"),
                 .product(name: "Carrier Primitives", package: "swift-carrier-primitives"),
-                .product(name: "Standard Library Extensions", package: "swift-standard-library-extensions"),
+                .product(
+                    name: "Standard Library Extensions",
+                    package: "swift-standard-library-extensions"
+                ),
             ]
         ),
         .target(
             name: "Clock Primitives Test Support",
             dependencies: [
                 "Clock Primitives",
-                .product(name: "Tagged Primitives Test Support", package: "swift-tagged-primitives"),
+                .product(
+                    name: "Tagged Primitives Test Support",
+                    package: "swift-tagged-primitives"
+                ),
             ],
             path: "Tests/Support"
         ),
@@ -49,7 +64,7 @@ let package = Package(
                 "Clock Primitives",
                 "Clock Primitives Test Support",
             ]
-        )
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
