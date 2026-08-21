@@ -11,8 +11,6 @@ extension Clock.Test {
     }
 }
 
-// MARK: - Unit
-
 extension Clock.Test.Test.Unit {
     @Test
     func `init default now is zero offset`() {
@@ -99,8 +97,6 @@ extension Clock.Test.Test.Unit {
     }
 }
 
-// MARK: - Edge Case
-
 extension Clock.Test.Test.`Edge Case` {
     @Test
     func `advance by zero`() {
@@ -147,8 +143,6 @@ extension Clock.Test.Test.`Edge Case` {
     }
 }
 
-// MARK: - Integration
-
 extension Clock.Test.Test.Integration {
     @Test
     func `sleep suspends until advance resumes it`() async throws {
@@ -182,14 +176,6 @@ extension Clock.Test.Test.Integration {
             order.withLock { $0.append(2) }
         }
 
-        // Step to each deadline in turn, draining the woken task before the next
-        // advance. A single `advance(by:)` past both deadlines resumes both
-        // continuations in deadline order, but their task *bodies* then run
-        // concurrently — so the observed append order was a race (flaky ~1-in-8
-        // under the full suite). Advancing to each deadline and awaiting the woken
-        // task makes the ordering deterministic and strengthens the assertion:
-        // `advance(to: 2s)` must wake task1 only (task2's 4s deadline is still in
-        // the future), and `advance(to: 4s)` then wakes task2.
         clock.advance(to: .init(offset: .seconds(2)))
         try await task1.value
         clock.advance(to: .init(offset: .seconds(4)))
@@ -237,17 +223,6 @@ extension Clock.Test.Test.Integration {
         #expect(clock.now.offset == .seconds(5))
     }
 
-    // MARK: - advance(by:) single-lock fold regression
-    //
-    // Pre-fix, `advance(by:)` read `now` under one `state.withLock` and then
-    // called `advance(to:)`, which re-locked. Under concurrent `advance(by:)`
-    // callers, two racers could compute their target from the same stale
-    // `now`, collapsing what should be two additive advances into one (or
-    // applying a smaller target after a larger one had already moved `now`
-    // forward). Folding the read and the advance into a single critical
-    // section makes every `advance(by:)` call additive regardless of
-    // interleaving: N concurrent callers each advancing by the same duration
-    // must sum to exactly N * duration, never less.
     @Test
     func `concurrent advance(by:) calls are additive under a single lock`() async {
         let clock = Clock.Test()
@@ -264,22 +239,11 @@ extension Clock.Test.Test.Integration {
         #expect(clock.now.offset == .milliseconds(Int64(iterations)))
     }
 
-    // MARK: - Ordering regression tests
-    //
-    // These verify the test clock resumes sleeps in DEADLINE order. They step the
-    // clock to each deadline in turn, draining the woken task before the next
-    // advance: a single advance past several deadlines resumes the continuations in
-    // deadline order, but their task BODIES then run concurrently, so the observed
-    // append order is a cross-platform race (flaky on macOS, deterministically wrong
-    // on Linux — `[2, 3, 1]`). Incremental advance makes the ordering deterministic
-    // without relying on executor FIFO behaviour.
-
     @Test @MainActor
     func `reverse-scheduled sleeps resume in deadline order`() async throws {
         let clock = Clock.Test()
         let order = Locked(initialState: [Int]())
 
-        // Schedule in REVERSE deadline order: 3, 2, 1
         let task3 = Task.immediate {
             try await clock.sleep(until: .init(offset: .seconds(6)))
             order.withLock { $0.append(3) }
@@ -295,8 +259,6 @@ extension Clock.Test.Test.Integration {
             order.withLock { $0.append(1) }
         }
 
-        // Advance to each deadline in turn, draining the woken task first —
-        // deterministic deadline-ordered waking regardless of schedule order.
         clock.advance(to: .init(offset: .seconds(2)))
         try await task1.value
         clock.advance(to: .init(offset: .seconds(4)))
@@ -326,42 +288,19 @@ extension Clock.Test.Test.Integration {
             order.withLock { $0.append(3) }
         }
 
-        // First advance resumes only task1
         clock.advance(by: .seconds(2))
         try await task1.value
         #expect(order.withLock { $0 } == [1])
 
-        // Second advance resumes only task2
         clock.advance(by: .seconds(2))
         try await task2.value
         #expect(order.withLock { $0 } == [1, 2])
 
-        // Third advance resumes only task3
         clock.advance(by: .seconds(2))
         try await task3.value
         #expect(order.withLock { $0 } == [1, 2, 3])
     }
 
-    // MARK: - F-002 regression: cancellation must be observed without an
-    // external advance()/run()
-    //
-    // Pre-fix, `sleep(until:)` only ever removed/resumed a suspended
-    // continuation from within `advance(to:)`/`run()`; a cancelled task's
-    // continuation stayed parked in `suspensions` until some LATER external
-    // advance/run happened to sweep past its deadline (or never, if none
-    // ever came). This regression asserts the task resolves on its own,
-    // promptly, from `task.cancel()` alone — no `clock.advance`/`clock.run`
-    // call anywhere in this test.
-    //
-    // The wait is bounded by a REAL wall-clock race (independent of
-    // `Clock.Test`'s own virtual time), and `sleeper` is polled rather than
-    // structurally awaited: a `withTaskGroup` that races `await
-    // sleeper.result` against a timeout task would still hang at its own
-    // implicit teardown, because structured concurrency waits for every
-    // child to finish even after `cancelAll()` — and `Task.result` does not
-    // itself observe ambient cancellation of the child that's awaiting it.
-    // Polling a plain `Locked` box sidesteps that trap: this test function
-    // returns on schedule regardless of whether `sleeper` ever completes.
     @Test
     func `cancellation resumes sleep promptly without any external advance or run`() async throws {
         let clock = Clock.Test()
@@ -404,32 +343,9 @@ extension Clock.Test.Test.Integration {
         }
     }
 
-    // MARK: - F-001 regression: deadline check and continuation registration
-    // must be atomic
-    //
-    // Pre-fix, `sleep(until:)` checked `now < deadline` and registered the
-    // continuation as two SEPARATE `state.withLock` acquisitions. A
-    // concurrent `advance(to:)` landing in the gap between them sees no
-    // registered entry yet, drains nothing, and the registration that
-    // follows appends an entry whose deadline has already elapsed — nothing
-    // but a LATER advance/run ever discovers it (in the worst case, nothing
-    // ever does, and the sleeper hangs forever). This hammers `advance(to:)`
-    // from several concurrently-running, genuinely unstructured tasks across
-    // many rounds while sleepers race to register, to make real multi-core
-    // interleaving land in that window.
-    //
-    // Sleepers and hammers are `Task.detached`, tracked via a `Locked`
-    // counter and polled with a bounded real-time loop — not a
-    // `withTaskGroup` — for the same reason as the F-002 test above: a
-    // stranded (never-resumed) sleeper would otherwise hang the group's
-    // implicit teardown forever, defeating the whole point of bounding this
-    // stress test.
     @Test
     func `concurrent advance hammering never strands a sleeper`() async throws {
-        // All rounds are launched CONCURRENTLY (not one after another) so the
-        // machine has as many genuinely-simultaneous hammer/sleeper pairs in
-        // flight as possible at any given instant — maximizing the chance
-        // that real multi-core preemption lands inside the pre-fix gap.
+
         let rounds = 300
         let sleepersPerRound = 8
         let hammerTasksPerRound = 4
@@ -514,19 +430,14 @@ extension Clock.Test.Test.Integration {
             order.withLock { $0.append(2) }
         }
 
-        // Cancel the middle task before advancing
         taskCancelled.cancel()
 
-        // Advance to each deadline in turn (deterministic). `advance(to: 4s)` wakes
-        // task2 and resumes the cancelled task, which throws CancellationError
-        // instead of appending 99.
         clock.advance(to: .init(offset: .seconds(2)))
         try await task1.value
         clock.advance(to: .init(offset: .seconds(4)))
         _ = await taskCancelled.result
         try await task2.value
 
-        // 99 must not appear; 1 and 2 must be in order
         #expect(order.withLock { $0 } == [1, 2])
     }
 }

@@ -11,8 +11,6 @@ extension Clock.Unimplemented {
     }
 }
 
-// MARK: - Unit
-
 extension Clock.Unimplemented.Test.Unit {
     @Test
     func `init creates instance`() {
@@ -68,8 +66,6 @@ extension Clock.Unimplemented.Test.Unit {
         #expect(a.hashValue == b.hashValue)
     }
 }
-
-// MARK: - Edge Case
 
 extension Clock.Unimplemented.Test.`Edge Case` {
     @Test

@@ -11,8 +11,6 @@ extension Clock.Continuous {
     }
 }
 
-// MARK: - Unit
-
 extension Clock.Continuous.Test.Unit {
     @Test
     func `init creates instance`() {
@@ -86,8 +84,6 @@ extension Clock.Continuous.Test.Unit {
         #expect(advanced.nanoseconds == 500_000_000)
     }
 }
-
-// MARK: - Edge Case
 
 extension Clock.Continuous.Test.`Edge Case` {
     @Test

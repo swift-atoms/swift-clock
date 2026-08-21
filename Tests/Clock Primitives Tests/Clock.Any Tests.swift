@@ -1,8 +1,6 @@
 import Clock_Primitives
 import Testing
 
-// Clock.Any is generic — use parallel namespace pattern per [TEST-004]
-
 @Suite
 struct `Clock.Any` {
     @Suite struct Unit {}
@@ -10,8 +8,6 @@ struct `Clock.Any` {
     @Suite struct Integration {}
     @Suite(.serialized) struct Performance {}
 }
-
-// MARK: - Unit
 
 extension `Clock.Any`.Unit {
     @Test
@@ -77,8 +73,6 @@ extension `Clock.Any`.Unit {
     }
 }
 
-// MARK: - Edge Case
-
 extension `Clock.Any`.`Edge Case` {
     @Test
     func `type-erased instant advanced by zero`() {
@@ -104,8 +98,6 @@ extension `Clock.Any`.`Edge Case` {
         #expect(erased.minimumResolution == .zero)
     }
 }
-
-// MARK: - Integration
 
 extension `Clock.Any`.Integration {
     @Test

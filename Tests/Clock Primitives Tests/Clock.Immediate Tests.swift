@@ -11,8 +11,6 @@ extension Clock.Immediate {
     }
 }
 
-// MARK: - Unit
-
 extension Clock.Immediate.Test.Unit {
     @Test
     func `init default now is zero offset`() {
@@ -85,8 +83,6 @@ extension Clock.Immediate.Test.Unit {
     }
 }
 
-// MARK: - Edge Case
-
 extension Clock.Immediate.Test.`Edge Case` {
     @Test
     func `sleep throws when task is cancelled`() async {
@@ -125,8 +121,6 @@ extension Clock.Immediate.Test.`Edge Case` {
         #expect(advanced.offset == .seconds(3))
     }
 }
-
-// MARK: - Integration
 
 extension Clock.Immediate.Test.Integration {
     @Test
