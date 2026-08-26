@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-clock-primitives",
+    name: "swift-clock",
     platforms: [
         .macOS(.v27),
         .iOS(.v27),
@@ -13,34 +13,34 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Clock Primitives",
-            targets: ["Clock Primitives"]
+            name: "Clock",
+            targets: ["Clock"]
         ),
         .library(
-            name: "Clock Primitives Test Support",
-            targets: ["Clock Primitives Test Support"]
+            name: "Clock Test Support",
+            targets: ["Clock Test Support"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-tagged-primitives.git",
+            url: "https://github.com/swift-molecules/swift-tagged.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-carrier-primitives.git",
+            url: "https://github.com/swift-molecules/swift-carrier.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
             branch: "main"
         ),
     ],
     targets: [
         .target(
-            name: "Clock Primitives",
+            name: "Clock",
             dependencies: [
-                .product(name: "Tagged Primitives", package: "swift-tagged-primitives"),
-                .product(name: "Carrier Primitives", package: "swift-carrier-primitives"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Carrier", package: "swift-carrier"),
                 .product(
                     name: "Standard Library Extensions",
                     package: "swift-standard-library-extensions"
@@ -48,21 +48,21 @@ let package = Package(
             ]
         ),
         .target(
-            name: "Clock Primitives Test Support",
+            name: "Clock Test Support",
             dependencies: [
-                "Clock Primitives",
+                "Clock",
                 .product(
-                    name: "Tagged Primitives Test Support",
-                    package: "swift-tagged-primitives"
+                    name: "Tagged Test Support",
+                    package: "swift-tagged"
                 ),
             ],
             path: "Tests/Support"
         ),
         .testTarget(
-            name: "Clock Primitives Tests",
+            name: "Clock Tests",
             dependencies: [
-                "Clock Primitives",
-                "Clock Primitives Test Support",
+                "Clock",
+                "Clock Test Support",
             ]
         ),
     ],

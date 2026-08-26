@@ -1,4 +1,4 @@
-public import Carrier_Primitives
+public import Carrier
 
 extension Clock.Offset: Carrier.`Protocol` {
 

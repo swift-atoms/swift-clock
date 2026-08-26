@@ -1,4 +1,4 @@
-public import Carrier_Primitives
+public import Carrier
 
 extension Tagged: @retroactive InstantProtocol
 where Underlying: InstantProtocol & Carrier.`Protocol`, Underlying.Underlying == Underlying {
