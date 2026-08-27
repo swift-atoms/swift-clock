@@ -7,6 +7,6 @@ extension Tagged where Underlying == Clock.Nanoseconds {
 
     @inlinable
     public init(nanoseconds: UInt64) {
-        self.init(Clock.Nanoseconds(nanoseconds))
+        self.init(_unchecked: Clock.Nanoseconds(nanoseconds))
     }
 }

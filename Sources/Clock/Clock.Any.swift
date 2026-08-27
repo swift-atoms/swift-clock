@@ -78,7 +78,7 @@
     private final class ConcreteBox<
         I: InstantProtocol & Hashable & Sendable,
         D: DurationProtocol & Hashable
-    >: Clock.`Any`<D>.Instant.Box where I.Duration == D {
+    >: Clock.`Any`<D>.Instant.Box, @unchecked Sendable where I.Duration == D {
 
         let instant: I
 
