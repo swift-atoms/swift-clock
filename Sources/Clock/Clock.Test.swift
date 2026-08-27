@@ -1,3 +1,5 @@
+public import Tagged
+
 #if !hasFeature(Embedded)
 
     import Synchronization

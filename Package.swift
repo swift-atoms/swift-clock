@@ -17,21 +17,17 @@ let package = Package(
             targets: ["Clock"]
         ),
         .library(
-            name: "Clock Test Support",
-            targets: ["Clock Test Support"]
+            name: "Clock Standard Library Integration",
+            targets: ["Clock Standard Library Integration"]
+        ),
+        .library(
+            name: "Clock Apple Foundation Integration",
+            targets: ["Clock Apple Foundation Integration"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-tagged.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-carrier.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
     ],
@@ -39,31 +35,23 @@ let package = Package(
         .target(
             name: "Clock",
             dependencies: [
-                .product(name: "Tagged", package: "swift-tagged"),
-                .product(name: "Carrier", package: "swift-carrier"),
-                .product(
-                    name: "Standard Library Extensions",
-                    package: "swift-standard-library-extensions"
-                ),
+                .product(name: "Tagged", package: "swift-tagged")
             ]
         ),
         .target(
-            name: "Clock Test Support",
+            name: "Clock Standard Library Integration",
+            dependencies: ["Clock"]
+        ),
+        .target(
+            name: "Clock Apple Foundation Integration",
             dependencies: [
                 "Clock",
-                .product(
-                    name: "Tagged Test Support",
-                    package: "swift-tagged"
-                ),
-            ],
-            path: "Tests/Support"
+                "Clock Standard Library Integration",
+            ]
         ),
         .testTarget(
             name: "Clock Tests",
-            dependencies: [
-                "Clock",
-                "Clock Test Support",
-            ]
+            dependencies: ["Clock"]
         ),
     ],
     swiftLanguageModes: [.v6]

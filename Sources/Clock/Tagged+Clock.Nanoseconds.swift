@@ -1,3 +1,5 @@
+public import Tagged
+
 extension Tagged where Underlying == Clock.Nanoseconds {
 
     @inlinable
