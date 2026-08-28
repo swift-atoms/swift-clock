@@ -22,23 +22,19 @@ let package = Package(
             url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
-        .package(
-            url: "https://github.com/swift-atoms/swift-carrier.git",
-            branch: "main"
-        ),
     ],
     targets: [
         .target(
             name: "Clock",
             dependencies: [
                 .product(name: "Tagged", package: "swift-tagged"),
-                .product(name: "Carrier Protocol", package: "swift-carrier"),
             ]
         ),
         .testTarget(
             name: "Clock Tests",
             dependencies: [
                 .target(name: "Clock"),
+                .product(name: "Tagged", package: "swift-tagged"),
             ]
         ),
     ],

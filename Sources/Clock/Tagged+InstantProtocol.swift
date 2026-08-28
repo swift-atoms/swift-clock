@@ -1,13 +1,13 @@
-public import Carrier_Protocol
+public import Tagged
 
 extension Tagged: @retroactive InstantProtocol
-where Underlying: InstantProtocol & Carrier.`Protocol`, Underlying.Underlying == Underlying {
+where Underlying: InstantProtocol {
 
     public typealias Duration = Underlying.Duration
 
     @inlinable
     public func advanced(by duration: Underlying.Duration) -> Self {
-        Self(underlying.advanced(by: duration))
+        Self(_unchecked: underlying.advanced(by: duration))
     }
 
     @inlinable
@@ -18,14 +18,13 @@ where Underlying: InstantProtocol & Carrier.`Protocol`, Underlying.Underlying ==
 
 extension Tagged
 where
-    Underlying: InstantProtocol & Carrier.`Protocol`,
-    Underlying.Underlying == Underlying,
+    Underlying: InstantProtocol,
     Underlying.Duration == Swift.Duration
 {
 
     @inlinable
     public func advanced(by duration: Swift.Duration) -> Self {
-        Self(underlying.advanced(by: duration))
+        Self(_unchecked: underlying.advanced(by: duration))
     }
 
     @inlinable
@@ -36,19 +35,18 @@ where
 
 extension Tagged
 where
-    Underlying: InstantProtocol & Carrier.`Protocol`,
-    Underlying.Underlying == Underlying,
+    Underlying: InstantProtocol,
     Underlying.Duration == Swift.Duration
 {
 
     @inlinable
     public static func + (lhs: Self, rhs: Swift.Duration) -> Self {
-        Self(lhs.underlying.advanced(by: rhs))
+        Self(_unchecked: lhs.underlying.advanced(by: rhs))
     }
 
     @inlinable
     public static func + (lhs: Swift.Duration, rhs: Self) -> Self {
-        Self(rhs.underlying.advanced(by: lhs))
+        Self(_unchecked: rhs.underlying.advanced(by: lhs))
     }
 
     @inlinable
@@ -58,7 +56,7 @@ where
 
     @inlinable
     public static func - (lhs: Self, rhs: Swift.Duration) -> Self {
-        Self(lhs.underlying.advanced(by: .zero - rhs))
+        Self(_unchecked: lhs.underlying.advanced(by: .zero - rhs))
     }
 
     @inlinable

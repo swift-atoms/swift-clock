@@ -2,7 +2,9 @@
 
     import Synchronization
 
-    extension Clock {
+public import Tagged
+
+extension Clock {
 
         public final class Test: _Concurrency.Clock, @unsafe @unchecked Sendable {
             private let state: Mutex<State>

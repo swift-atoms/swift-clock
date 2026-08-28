@@ -1,6 +1,8 @@
 #if !hasFeature(Embedded)
 
-    extension Clock {
+public import Tagged
+
+extension Clock {
 
         public struct Unimplemented: _Concurrency.Clock, Sendable {
 

@@ -1,3 +1,5 @@
+public import Tagged
+
 extension Clock {
 
     public struct Continuous: Sendable {

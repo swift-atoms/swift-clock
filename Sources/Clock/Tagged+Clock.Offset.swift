@@ -1,3 +1,5 @@
+public import Tagged
+
 extension Tagged where Underlying == Clock.Offset {
 
     @inlinable
@@ -5,6 +7,6 @@ extension Tagged where Underlying == Clock.Offset {
 
     @inlinable
     public init(offset: Swift.Duration = .zero) {
-        self.init(Clock.Offset(offset))
+        self.init(_unchecked: Clock.Offset(offset))
     }
 }
