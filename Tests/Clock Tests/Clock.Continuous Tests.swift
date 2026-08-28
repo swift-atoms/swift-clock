@@ -1,5 +1,4 @@
 import Clock
-import Tagged
 import Testing
 
 extension Clock.Continuous {

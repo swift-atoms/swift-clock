@@ -1,5 +1,3 @@
-public import Tagged
-
 extension Clock.Continuous {
 
     public struct Deadline: Sendable, Hashable {

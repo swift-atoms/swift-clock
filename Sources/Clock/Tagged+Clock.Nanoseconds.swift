@@ -1,5 +1,3 @@
-public import Tagged
-
 extension Tagged where Underlying == Clock.Nanoseconds {
 
     @inlinable
@@ -7,6 +5,6 @@ extension Tagged where Underlying == Clock.Nanoseconds {
 
     @inlinable
     public init(nanoseconds: UInt64) {
-        self.init(_unchecked: Clock.Nanoseconds(nanoseconds))
+        self.init(Clock.Nanoseconds(nanoseconds))
     }
 }

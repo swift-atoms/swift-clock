@@ -1,5 +1,3 @@
-public import Tagged
-
 #if !hasFeature(Embedded)
 
     extension Clock {
