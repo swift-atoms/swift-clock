@@ -26,10 +26,6 @@ let package = Package(
             url: "https://github.com/swift-atoms/swift-carrier.git",
             branch: "main"
         ),
-        .package(
-            url: "https://github.com/swift-primitives/swift-standard-library-extensions.git",
-            branch: "main"
-        ),
     ],
     targets: [
         .target(
@@ -37,10 +33,6 @@ let package = Package(
             dependencies: [
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Carrier Protocol", package: "swift-carrier"),
-                .product(
-                    name: "Standard Library Extensions",
-                    package: "swift-standard-library-extensions"
-                ),
             ]
         ),
         .testTarget(
