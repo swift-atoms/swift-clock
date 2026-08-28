@@ -16,22 +16,14 @@ let package = Package(
             name: "Clock",
             targets: ["Clock"]
         ),
-        .library(
-            name: "Clock Test Support",
-            targets: ["Clock Test Support"]
-        ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-tagged.git",
+            url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-carrier.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-molecules/swift-standard-library-extensions.git",
+            url: "https://github.com/swift-atoms/swift-carrier.git",
             branch: "main"
         ),
     ],
@@ -40,29 +32,13 @@ let package = Package(
             name: "Clock",
             dependencies: [
                 .product(name: "Tagged", package: "swift-tagged"),
-                .product(name: "Carrier", package: "swift-carrier"),
-                .product(
-                    name: "Standard Library Extensions",
-                    package: "swift-standard-library-extensions"
-                ),
+                .product(name: "Carrier Protocol", package: "swift-carrier"),
             ]
-        ),
-        .target(
-            name: "Clock Test Support",
-            dependencies: [
-                "Clock",
-                .product(
-                    name: "Tagged Test Support",
-                    package: "swift-tagged"
-                ),
-            ],
-            path: "Tests/Support"
         ),
         .testTarget(
             name: "Clock Tests",
             dependencies: [
-                "Clock",
-                "Clock Test Support",
+                .target(name: "Clock"),
             ]
         ),
     ],

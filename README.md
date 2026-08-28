@@ -55,7 +55,7 @@ The clock family also includes `Clock.Suspending` (pauses while the system sleep
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-molecules/swift-clock.git", branch: "main")
+    .package(url: "https://github.com/swift-atoms/swift-clock.git", branch: "main")
 ]
 ```
 
@@ -74,12 +74,11 @@ Requires Swift 6.3.1 and macOS 26 / iOS 26 / tvOS 26 / watchOS 26 / visionOS 26 
 
 ## Architecture
 
-Two library products.
+One base library product.
 
 | Product | Target | Purpose |
 |---------|--------|---------|
-| `Clock` | `Sources/Clock/` | The `Clock` namespace: `Clock.Nanoseconds` / `Clock.Offset` instant storage, phantom-tagged `Continuous` / `Suspending` / `Test` / `Immediate` / `Unimplemented` clocks, `Clock.Continuous.Deadline` (+ atomic `Deadline.Next`), and `Clock.Any` type erasure. |
-| `Clock Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
+| `Clock` | `Sources/Clock/` | The base `Clock` namespace: `Clock.Nanoseconds` / `Clock.Offset` instant storage, phantom-tagged `Continuous` / `Suspending` / `Test` / `Immediate` / `Unimplemented` clocks, `Clock.Continuous.Deadline` (+ atomic `Deadline.Next`), and `Clock.Any` type erasure. |
 
 Foundation-free. Builds on `swift-tagged` (phantom typing), `swift-carrier` (cross-clock generic dispatch), and `swift-standard-library-extensions`.
 
