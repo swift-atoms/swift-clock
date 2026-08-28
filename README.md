@@ -1,4 +1,4 @@
-# Clock Primitives
+# Clock
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
@@ -11,7 +11,7 @@ Clock types for Swift — phantom-tagged instants, saturating deadlines, and the
 `Clock` is the namespace for time measurement and scheduling. Instants are phantom-tagged so a continuous-clock instant and a suspending-clock instant are distinct types that cannot be mixed at compile time — the storage is identical (`UInt64` nanoseconds), but the tag keeps the clock identity in the type.
 
 ```swift
-import Clock_Primitives
+import Clock
 
 // Instants carry their clock's identity in the type.
 let start = Clock.Continuous.Instant(nanoseconds: 1_000_000_000)
@@ -55,7 +55,7 @@ The clock family also includes `Clock.Suspending` (pauses while the system sleep
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-clock-primitives.git", branch: "main")
+    .package(url: "https://github.com/swift-atoms/swift-clock.git", branch: "main")
 ]
 ```
 
@@ -63,7 +63,7 @@ dependencies: [
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Clock Primitives", package: "swift-clock-primitives"),
+        .product(name: "Clock", package: "swift-clock"),
     ]
 )
 ```
@@ -74,14 +74,13 @@ Requires Swift 6.3.1 and macOS 26 / iOS 26 / tvOS 26 / watchOS 26 / visionOS 26 
 
 ## Architecture
 
-Two library products.
+One base library product.
 
 | Product | Target | Purpose |
 |---------|--------|---------|
-| `Clock Primitives` | `Sources/Clock Primitives/` | The `Clock` namespace: `Clock.Nanoseconds` / `Clock.Offset` instant storage, phantom-tagged `Continuous` / `Suspending` / `Test` / `Immediate` / `Unimplemented` clocks, `Clock.Continuous.Deadline` (+ atomic `Deadline.Next`), and `Clock.Any` type erasure. |
-| `Clock Primitives Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
+| `Clock` | `Sources/Clock/` | The base `Clock` namespace: `Clock.Nanoseconds` / `Clock.Offset` instant storage, phantom-tagged `Continuous` / `Suspending` / `Test` / `Immediate` / `Unimplemented` clocks, `Clock.Continuous.Deadline` (+ atomic `Deadline.Next`), and `Clock.Any` type erasure. |
 
-Foundation-free. Builds on `swift-tagged-primitives` (phantom typing), `swift-carrier-primitives` (cross-clock generic dispatch), and `swift-standard-library-extensions`.
+Foundation-free. Builds on `swift-tagged` (phantom typing), `swift-carrier` (cross-clock generic dispatch), and `swift-standard-library-extensions`.
 
 ---
 

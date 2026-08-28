@@ -1,4 +1,4 @@
-import Clock_Primitives
+import Clock
 import Testing
 
 extension Clock.Unimplemented {
