@@ -4,15 +4,15 @@ import Testing
 
 extension Clock.Unimplemented {
     @Suite
-    struct Test {
-        @Suite struct Unit {}
-        @Suite struct `Edge Case` {}
-        @Suite struct Integration {}
-        @Suite(.serialized) struct Performance {}
+    struct `Clock operations preserve their contracts` {
+        @Suite struct `Values preserve their representation` {}
+        @Suite struct `Boundary values preserve their contracts` {}
+        @Suite struct `Operations compose correctly` {}
+        @Suite(.serialized) struct `Operations meet performance expectations` {}
     }
 }
 
-extension Clock.Unimplemented.Test.Unit {
+extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Values preserve their representation` {
     @Test
     func `init creates instance`() {
         let clock = Clock.Unimplemented()
@@ -68,7 +68,7 @@ extension Clock.Unimplemented.Test.Unit {
     }
 }
 
-extension Clock.Unimplemented.Test.`Edge Case` {
+extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
     func `Instant advanced by zero`() {
         let instant = Clock.Unimplemented.Instant(offset: .seconds(1))

@@ -2,14 +2,14 @@ import Clock
 import Testing
 
 @Suite
-struct `Clock.Any` {
-    @Suite struct Unit {}
-    @Suite struct `Edge Case` {}
-    @Suite struct Integration {}
-    @Suite(.serialized) struct Performance {}
+struct `Erased clocks preserve their wrapped behavior` {
+    @Suite struct `Values preserve their representation` {}
+    @Suite struct `Boundary values preserve their contracts` {}
+    @Suite struct `Operations compose correctly` {}
+    @Suite(.serialized) struct `Operations meet performance expectations` {}
 }
 
-extension `Clock.Any`.Unit {
+extension `Erased clocks preserve their wrapped behavior`.`Values preserve their representation` {
     @Test
     func `wrapping Immediate clock preserves now`() {
         let immediate = Clock.Immediate()
@@ -73,7 +73,7 @@ extension `Clock.Any`.Unit {
     }
 }
 
-extension `Clock.Any`.`Edge Case` {
+extension `Erased clocks preserve their wrapped behavior`.`Boundary values preserve their contracts` {
     @Test
     func `type-erased instant advanced by zero`() {
         let immediate = Clock.Immediate()
@@ -99,7 +99,7 @@ extension `Clock.Any`.`Edge Case` {
     }
 }
 
-extension `Clock.Any`.Integration {
+extension `Erased clocks preserve their wrapped behavior`.`Operations compose correctly` {
     @Test
     func `wrapping Test clock: sleep and advance`() async throws {
         let test = Clock.Test()

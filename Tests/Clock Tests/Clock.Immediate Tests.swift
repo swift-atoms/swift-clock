@@ -4,15 +4,15 @@ import Testing
 
 extension Clock.Immediate {
     @Suite
-    struct Test {
-        @Suite struct Unit {}
-        @Suite struct `Edge Case` {}
-        @Suite struct Integration {}
-        @Suite(.serialized) struct Performance {}
+    struct `Clock operations preserve their contracts` {
+        @Suite struct `Values preserve their representation` {}
+        @Suite struct `Boundary values preserve their contracts` {}
+        @Suite struct `Operations compose correctly` {}
+        @Suite(.serialized) struct `Operations meet performance expectations` {}
     }
 }
 
-extension Clock.Immediate.Test.Unit {
+extension Clock.Immediate.`Clock operations preserve their contracts`.`Values preserve their representation` {
     @Test
     func `init default now is zero offset`() {
         let clock = Clock.Immediate()
@@ -84,7 +84,7 @@ extension Clock.Immediate.Test.Unit {
     }
 }
 
-extension Clock.Immediate.Test.`Edge Case` {
+extension Clock.Immediate.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
     func `sleep throws when task is cancelled`() async {
         let clock = Clock.Immediate()
@@ -123,7 +123,7 @@ extension Clock.Immediate.Test.`Edge Case` {
     }
 }
 
-extension Clock.Immediate.Test.Integration {
+extension Clock.Immediate.`Clock operations preserve their contracts`.`Operations compose correctly` {
     @Test
     func `sequential sleeps advance time cumulatively`() async throws {
         let clock = Clock.Immediate()

@@ -10,7 +10,7 @@ public import Tagged
 #if !hasFeature(Embedded)
 extension Clock {
 
-        public final class Test: _Concurrency.Clock, @unsafe @unchecked Sendable {
+        public final class Test: _Concurrency.Clock, Sendable {
             private let state: Mutex<State>
 
             public init(now: Instant = .init()) {

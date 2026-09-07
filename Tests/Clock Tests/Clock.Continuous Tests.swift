@@ -4,15 +4,15 @@ import Testing
 
 extension Clock.Continuous {
     @Suite
-    struct Test {
-        @Suite struct Unit {}
-        @Suite struct `Edge Case` {}
-        @Suite struct Integration {}
-        @Suite(.serialized) struct Performance {}
+    struct `Clock operations preserve their contracts` {
+        @Suite struct `Values preserve their representation` {}
+        @Suite struct `Boundary values preserve their contracts` {}
+        @Suite struct `Operations compose correctly` {}
+        @Suite(.serialized) struct `Operations meet performance expectations` {}
     }
 }
 
-extension Clock.Continuous.Test.Unit {
+extension Clock.Continuous.`Clock operations preserve their contracts`.`Values preserve their representation` {
     @Test
     func `init creates instance`() {
         let clock = Clock.Continuous()
@@ -86,7 +86,7 @@ extension Clock.Continuous.Test.Unit {
     }
 }
 
-extension Clock.Continuous.Test.`Edge Case` {
+extension Clock.Continuous.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
     func `Instant advanced by zero duration`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 42)

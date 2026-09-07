@@ -16,7 +16,7 @@ where
 }
 
 @Suite
-struct `Tagged InstantProtocol Tests` {
+struct `Tagged instants preserve their duration operations` {
 
     @Test
     func `tagged instant requires only InstantProtocol`() {

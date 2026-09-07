@@ -1,6 +1,6 @@
 extension Clock {
 
-    public struct Offset: InstantProtocol, Sendable, Hashable, Comparable {
+    public struct Offset: Sendable, Hashable {
 
         public let rawValue: Swift.Duration
 

@@ -30,24 +30,9 @@ extension Clock.Continuous.Deadline {
         _ duration: Duration,
         from instant: Clock.Continuous.Instant
     ) -> Self {
-        let currentNs = instant.nanoseconds
-        let (seconds, attoseconds) = duration.components
-        let (secNanos, overflowMul) = seconds.multipliedReportingOverflow(by: 1_000_000_000)
-        if overflowMul {
-            return seconds > 0 ? .never : Self(Clock.Continuous.Instant(nanoseconds: 0))
-        }
-        let totalNanos = secNanos &+ (attoseconds / 1_000_000_000)
-        guard totalNanos >= 0 else {
-            let absNs = UInt64(-totalNanos)
-            let subtracted = currentNs &- absNs
-            return Self(
-                Clock.Continuous.Instant(nanoseconds: subtracted > currentNs ? 0 : subtracted)
-            )
-        }
-        let added = currentNs &+ UInt64(totalNanos)
-        return Self(
-            Clock.Continuous.Instant(nanoseconds: added < currentNs ? .max : added)
-        )
+        let nanoseconds = duration.attoseconds / 1_000_000_000
+        let result = Int128(instant.nanoseconds) + nanoseconds
+        return Self(Clock.Continuous.Instant(nanoseconds: UInt64(clamping: result)))
     }
 }
 

@@ -1,6 +1,6 @@
 extension Clock {
 
-    public struct Nanoseconds: InstantProtocol, Sendable, Hashable, Comparable {
+    public struct Nanoseconds: Sendable, Hashable {
 
         public let rawValue: UInt64
 
@@ -15,16 +15,14 @@ extension Clock.Nanoseconds {
 
     @inlinable
     public func advanced(by duration: Swift.Duration) -> Self {
-        let (seconds, attoseconds) = duration.components
-        let nanos = seconds * 1_000_000_000 + attoseconds / 1_000_000_000
-        return Self(rawValue &+ UInt64(bitPattern: nanos))
+        let nanoseconds = duration.attoseconds / 1_000_000_000
+        return Self(rawValue &+ UInt64(truncatingIfNeeded: nanoseconds))
     }
 
     @inlinable
     public func duration(to other: Self) -> Swift.Duration {
-
-        let diff = Int64(bitPattern: other.rawValue &- rawValue)
-        return .nanoseconds(diff)
+        let difference = Int128(other.rawValue) - Int128(rawValue)
+        return Swift.Duration(attoseconds: difference * 1_000_000_000)
     }
 
     @inlinable
