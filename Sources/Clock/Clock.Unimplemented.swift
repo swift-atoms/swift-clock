@@ -1,7 +1,9 @@
 #if !hasFeature(Embedded)
-
 public import Tagged
+#endif
 
+
+#if !hasFeature(Embedded)
 extension Clock {
 
         public struct Unimplemented: _Concurrency.Clock, Sendable {
@@ -9,8 +11,11 @@ extension Clock {
             public init() {}
         }
     }
+#endif
 
-    extension Clock.Unimplemented {
+
+#if !hasFeature(Embedded)
+extension Clock.Unimplemented {
 
         public typealias Instant = Tagged<Self, Clock.Offset>
 
@@ -33,5 +38,4 @@ extension Clock {
             )
         }
     }
-
 #endif

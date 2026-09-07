@@ -13,8 +13,8 @@ let package = Package(
     ],
     products: [
         .library(name: "Clock", targets: ["Clock"]),
-        .library(name: "Clock Standard Library Integration", targets: ["Clock Standard Library Integration"]),
-        .library(name: "Clock Foundation Library Integration", targets: ["Clock Foundation Library Integration"]),
+
+        .library(name: "Clock Foundation Integration", targets: ["Clock Foundation Integration"]),
         .library(name: "Clock Test Support", targets: ["Clock Test Support"]),
     ],
     dependencies: [
@@ -31,20 +31,13 @@ let package = Package(
             ],
             path: "Sources/Clock"
         ),
+        
         .target(
-            name: "Clock Standard Library Integration",
+            name: "Clock Foundation Integration",
             dependencies: [
                 .target(name: "Clock"),
             ],
-            path: "Sources/Clock Standard Library Integration"
-        ),
-        .target(
-            name: "Clock Foundation Library Integration",
-            dependencies: [
-                .target(name: "Clock"),
-                .target(name: "Clock Standard Library Integration"),
-            ],
-            path: "Sources/Clock Foundation Library Integration"
+            path: "Sources/Clock Foundation Integration"
         ),
         .target(
             name: "Clock Test Support",
@@ -59,8 +52,7 @@ let package = Package(
                 .target(name: "Clock"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .target(name: "Clock Test Support"),
-                .target(name: "Clock Standard Library Integration"),
-                .target(name: "Clock Foundation Library Integration"),
+                .target(name: "Clock Foundation Integration"),
             ],
             path: "Tests/Clock Tests"
         ),

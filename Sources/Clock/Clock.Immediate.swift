@@ -1,9 +1,13 @@
 #if !hasFeature(Embedded)
+import Synchronization
+#endif
 
-    import Synchronization
-
+#if !hasFeature(Embedded)
 public import Tagged
+#endif
 
+
+#if !hasFeature(Embedded)
 extension Clock {
 
         public final class Immediate: _Concurrency.Clock, @unsafe @unchecked Sendable {
@@ -14,8 +18,11 @@ extension Clock {
             }
         }
     }
+#endif
 
-    extension Clock.Immediate {
+
+#if !hasFeature(Embedded)
+extension Clock.Immediate {
 
         public typealias Instant = Tagged<Clock.Immediate, Clock.Offset>
 
@@ -24,8 +31,11 @@ extension Clock {
             var minimumResolution: Duration
         }
     }
+#endif
 
-    extension Clock.Immediate {
+
+#if !hasFeature(Embedded)
+extension Clock.Immediate {
 
         public var now: Instant {
             state.withLock { $0.now }
@@ -47,5 +57,4 @@ extension Clock {
             state.withLock { $0.now = deadline }
         }
     }
-
 #endif

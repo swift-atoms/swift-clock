@@ -51,14 +51,6 @@ extension Clock.Continuous.Deadline {
     }
 }
 
-extension Clock.Continuous.Deadline: Comparable {
-
-    @inlinable
-    public static func < (lhs: Clock.Continuous.Deadline, rhs: Clock.Continuous.Deadline) -> Bool {
-        lhs.instant < rhs.instant
-    }
-}
-
 extension Clock.Continuous.Deadline {
 
     @inlinable

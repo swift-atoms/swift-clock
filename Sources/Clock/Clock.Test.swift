@@ -1,9 +1,13 @@
 #if !hasFeature(Embedded)
+import Synchronization
+#endif
 
-    import Synchronization
-
+#if !hasFeature(Embedded)
 public import Tagged
+#endif
 
+
+#if !hasFeature(Embedded)
 extension Clock {
 
         public final class Test: _Concurrency.Clock, @unsafe @unchecked Sendable {
@@ -21,8 +25,11 @@ extension Clock {
             }
         }
     }
+#endif
 
-    extension Clock.Test {
+
+#if !hasFeature(Embedded)
+extension Clock.Test {
 
         public typealias Instant = Tagged<Clock.Test, Clock.Offset>
 
@@ -33,16 +40,22 @@ extension Clock {
             var suspensions: [Entry]
         }
     }
+#endif
 
-    extension Clock.Test.State {
+
+#if !hasFeature(Embedded)
+extension Clock.Test.State {
         struct Entry: Sendable {
             let id: UInt64
             let deadline: Clock.Test.Instant
             let continuation: CheckedContinuation<Void, Never>
         }
     }
+#endif
 
-    extension Clock.Test {
+
+#if !hasFeature(Embedded)
+extension Clock.Test {
 
         public var now: Instant {
             state.withLock { $0.now }
@@ -151,15 +164,20 @@ extension Clock {
             }
         }
     }
+#endif
 
-    extension Clock.Test {
+
+#if !hasFeature(Embedded)
+extension Clock.Test {
 
         public enum Suspension {}
     }
+#endif
 
-    extension Clock.Test.Suspension {
+
+#if !hasFeature(Embedded)
+extension Clock.Test.Suspension {
 
         public struct Error: Swift.Error, Sendable {}
     }
-
 #endif

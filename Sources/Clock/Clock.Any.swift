@@ -1,6 +1,5 @@
 #if !hasFeature(Embedded)
-
-    extension Clock {
+extension Clock {
 
         public struct `Any`<D: DurationProtocol & Hashable>: _Concurrency.Clock, @unchecked Sendable
         {
@@ -43,8 +42,11 @@
             }
         }
     }
+#endif
 
-    extension Clock.`Any`.Instant {
+
+#if !hasFeature(Embedded)
+extension Clock.`Any`.Instant {
 
         public func advanced(by duration: D) -> Self {
             Self(_box: _box.advanced(by: duration))
@@ -74,8 +76,11 @@
             func hash(into hasher: inout Hasher) { fatalError("Must be overridden") }
         }
     }
+#endif
 
-    private final class ConcreteBox<
+
+#if !hasFeature(Embedded)
+private final class ConcreteBox<
         I: InstantProtocol & Hashable & Sendable,
         D: DurationProtocol & Hashable
     >: Clock.`Any`<D>.Instant.Box where I.Duration == D {
@@ -121,5 +126,4 @@
             hasher.combine(instant)
         }
     }
-
 #endif
