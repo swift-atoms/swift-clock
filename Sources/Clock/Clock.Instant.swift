@@ -7,6 +7,6 @@ extension Clock {
     /// The provider defines the shared reference; it is not inherently the Unix
     /// epoch or boot time. A domain tag does not distinguish machines, boots, or
     /// independently chosen references. Only readings with a shared reference
-    /// may be compared. All temporal arithmetic is supplied by Time and Tagged.
-    public typealias Instant<Domain: ~Copyable & ~Escapable> = Tagged<Domain, Time.Coordinate>
+    /// may be compared. Affine arithmetic is selected explicitly in composition packages.
+    public typealias Instant<Domain: ~Copyable & ~Escapable> = Tagged<Domain, Time.Instant>
 }

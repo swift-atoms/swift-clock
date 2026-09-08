@@ -1,93 +1,22 @@
 import Clock
 import Testing
 
-@Suite
-struct `Clock deadlines distinguish finite expiration from never` {
-    @Test
-    func `a finite deadline expires at its instant and has no negative remaining time`() {
-        let origin = Clock.Continuous.Instant.reference
-        let deadline = Clock.Continuous.Deadline.after(.seconds(3), from: origin)
-
-        #expect(deadline == .at(origin + .seconds(3)))
-        #expect(deadline.instant == origin + .seconds(3))
-        #expect(!deadline.hasExpired(at: origin))
-        #expect(deadline.remaining(at: origin) == .seconds(3))
-        #expect(deadline.hasExpired(at: origin + .seconds(3)))
-        #expect(deadline.remaining(at: origin + .seconds(3)) == .zero)
-        #expect(deadline.hasExpired(at: origin + .seconds(4)))
-        #expect(deadline.remaining(at: origin + .seconds(4)) == .zero)
-    }
-
-    @Test
-    func `a negative delay produces an expired finite deadline before the reference`() {
-        let origin = Clock.Suspending.Instant.reference
-        let deadline = Clock.Suspending.Deadline.after(.seconds(-1), from: origin)
-
-        #expect(deadline.instant?.offset == .seconds(-1))
-        #expect(deadline.hasExpired(at: origin))
-        #expect(deadline.remaining(at: origin) == .zero)
-    }
-
-    @Test
-    func `a subnanosecond delay is preserved instead of expiring early`() {
-        let origin = Clock.Continuous.Instant.reference
-        let duration = Swift.Duration(attoseconds: 1)
-        let deadline = Clock.Continuous.Deadline.after(duration, from: origin)
-
-        #expect(!deadline.hasExpired(at: origin))
-        #expect(deadline.remaining(at: origin) == duration)
-        #expect(deadline.hasExpired(at: origin + duration))
-    }
-
-    @Test(arguments: [Int128.min, -1, 0, 1, Int128.max])
-    func `never has no finite instant or remaining duration and never expires`(
-        attoseconds: Int128
-    ) {
-        let now = Clock.Continuous.Instant(offset: .init(attoseconds: attoseconds))
-        let never = Clock.Continuous.Deadline.never
-
-        #expect(never.instant == nil)
-        #expect(never.remaining(at: now) == nil)
-        #expect(!never.hasExpired(at: now))
-    }
-
-    @Test
-    func `the largest finite coordinate remains distinct from never`() {
-        let origin = Clock.Continuous.Instant.reference
-        let duration = Swift.Duration(attoseconds: .max)
-        let maximum = origin + duration
-        let finite = Clock.Continuous.Deadline.after(duration, from: origin)
-        let never = Clock.Continuous.Deadline.never
-
-        #expect(finite != never)
-        #expect(finite.instant == maximum)
-        #expect(finite.remaining(at: origin) == duration)
-        #expect(finite.hasExpired(at: maximum))
-        #expect(!never.hasExpired(at: maximum))
-        #expect(Set([finite, never]).count == 2)
-    }
-
-    @Test
-    func `expired deadlines do not subtract unrepresentably distant coordinates`() {
-        let minimum = Clock.Continuous.Instant(offset: .init(attoseconds: .min))
-        let maximum = Clock.Continuous.Instant(offset: .init(attoseconds: .max))
-
-        #expect(Clock.Continuous.Deadline(minimum).remaining(at: maximum) == .zero)
-    }
-
-    @Test
-    func `all finite deadlines precede never and preserve instant ordering`() {
-        let origin = Clock.Suspending.Instant.reference
-        let early = Clock.Suspending.Deadline(origin - .seconds(1))
-        let late = Clock.Suspending.Deadline(origin + .seconds(1))
-        let never = Clock.Suspending.Deadline.never
-
-        #expect([never, late, early].sorted() == [early, late, never])
-        #expect(!(never < never))
-        #expect(!(early < early))
-    }
+private final class OpaquePayload { var value = 0 }
+@Test func `Deadline representation does not require protocols`() {
+    let payload = OpaquePayload()
+    let deadline = Clock.Deadline(payload)
+    #expect(deadline.instant === payload)
+    #expect(Clock.Deadline<OpaquePayload>.never.instant == nil)
 }
-
+@Test func `Ordering and expiration need only comparable`() {
+    let first = Clock.Deadline(1)
+    let last = Clock.Deadline(2)
+    #expect([.never, last, first].sorted() == [first, last, .never])
+    #expect(!last.hasExpired(at: 1))
+    #expect(last.hasExpired(at: 2))
+    #expect(!Clock.Deadline<Int>.never.hasExpired(at: .max))
+    #expect(Set([first, first, last]).count == 2)
+}
 // An independent instant and duration pair exercises the generic deadline
 // contract without relying on Swift.Duration or Clock.Instant.
 private struct TickDuration: Swift.DurationProtocol, Hashable {
@@ -119,4 +48,24 @@ func `deadline operations reuse any instant and its associated duration`() {
     #expect(deadline.remaining(at: origin) == TickDuration(count: 3))
     #expect(deadline.hasExpired(at: TickInstant(tick: 10)))
     #expect(deadline < .never)
+}
+
+@Test func `Protocol deadline operations retain their arithmetic contract`() {
+    let origin = TickInstant(tick: 7)
+    let past = Clock.Deadline<TickInstant>.after(.init(count: -1), from: origin)
+    let future = Clock.Deadline<TickInstant>.after(.init(count: 3), from: origin)
+    let never = Clock.Deadline<TickInstant>.never
+    #expect(past.instant == TickInstant(tick: 6))
+    #expect(past.hasExpired(at: origin))
+    #expect(past.remaining(at: origin) == .zero)
+    #expect(future.remaining(at: TickInstant(tick: 10)) == .zero)
+    #expect(future.remaining(at: TickInstant(tick: 11)) == .zero)
+    #expect(never.remaining(at: origin) == nil)
+    #expect(never.instant == nil)
+    #expect(!never.hasExpired(at: origin))
+}
+@Test func `Expired protocol deadlines do not compute an overflowing difference`() {
+    let earliest = TickInstant(tick: .min)
+    let latest = TickInstant(tick: .max)
+    #expect(Clock.Deadline(earliest).remaining(at: latest) == .zero)
 }

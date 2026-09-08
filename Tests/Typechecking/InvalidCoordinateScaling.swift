@@ -1,4 +1,4 @@
-// expected-error: operator function '*' requires that 'Time.Coordinate' conform to '_CarrierProtocol'
+// expected-error: and 'Cardinal' be equivalent
 import Time
 
 let invalid = Time.Coordinate.reference * 2

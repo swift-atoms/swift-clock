@@ -23,7 +23,8 @@ func verify() throws {
             "-enable-upcoming-feature", "MemberImportVisibility",
             "-enable-upcoming-feature", "InternalImportsByDefault",
             "-enable-experimental-feature", "Lifetimes",
-            "-I", products, "-module-cache-path", scratch.appendingPathComponent("modules").path,
+            "-I", products, "-I", URL(fileURLWithPath: products).appendingPathComponent("Modules").path,
+            "-module-cache-path", scratch.appendingPathComponent("modules").path,
             fixture.path,
         ]
         let pipe = Pipe()
@@ -35,9 +36,18 @@ func verify() throws {
         return (process.terminationStatus, String(decoding: output, as: UTF8.self))
     }
 
-    let valid = try typecheck(fixtures.appendingPathComponent("Valid.swift"))
-    guard valid.status == 0 else {
-        throw VerificationFailure(description: "Valid client failed:\n\(valid.diagnostics)")
+    let validFixtures = try FileManager.default.contentsOfDirectory(
+        at: fixtures, includingPropertiesForKeys: nil
+    ).filter { $0.lastPathComponent.hasPrefix("Valid") && $0.pathExtension == "swift" }
+        .sorted { $0.lastPathComponent < $1.lastPathComponent }
+    guard !validFixtures.isEmpty else {
+        throw VerificationFailure(description: "No valid compiler fixtures were found")
+    }
+    for fixture in validFixtures {
+        let result = try typecheck(fixture)
+        guard result.status == 0 else {
+            throw VerificationFailure(description: "Valid client \(fixture.lastPathComponent) failed:\n\(result.diagnostics)")
+        }
     }
     let invalid = try FileManager.default.contentsOfDirectory(
         at: fixtures, includingPropertiesForKeys: nil

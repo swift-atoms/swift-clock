@@ -1,4 +1,4 @@
-// expected-error: cannot convert value of type
+// expected-error: cannot assign value of type
 import Clock
 import Time
 

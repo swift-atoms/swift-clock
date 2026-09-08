@@ -1,4 +1,4 @@
-// expected-error: (aka 'Time.Coordinate') and 'Cardinal' be equivalent
+// expected-error: and 'Cardinal' be equivalent
 import Clock
 
 let instant = Clock.Continuous.Instant.reference

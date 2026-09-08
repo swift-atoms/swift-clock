@@ -1,102 +1,53 @@
 # Clock domain
 
-Clock supplies platform-independent domain identities and deadlines. Time owns
-temporal point arithmetic; Tagged preserves domain identity.
+Clock supplies platform-independent timeline identities and deadline representations.
+It does not sample time, sleep, or conform its domain markers to Swift.Clock.
 
-## Instants are aliases
+## Exact alias identity
 
 ```swift
 import Clock
 
-// Exact type identity, not a wrapper containing a tagged value:
-let instant: Clock.Continuous.Instant = Tagged<Clock.Continuous, Time.Coordinate>(
-    _unchecked: Time.Coordinate(offset: .seconds(3))
-)
-let earlier = instant - .seconds(1)
-let elapsed: Swift.Duration = instant - earlier
+let instant = Clock.Continuous.Instant(offset: .seconds(3))
+let tagged: Tagged<Clock.Continuous, Time.Instant> = instant
+let deadline = Clock.Continuous.Deadline.at(instant)
 ```
 
-The generic alias is:
+Clock.Instant<Domain> is exactly Tagged<Domain, Time.Instant>.
+Time.Instant is an alias of Time.Coordinate, which is
+Tagged<Time, Coordinate<1, Swift.Duration>>.
+Neither alias conforms to Swift.InstantProtocol. Duration storage does not by itself
+make every generic coordinate a temporal instant.
 
-```swift
-extension Clock {
-    public typealias Instant<Domain: ~Copyable & ~Escapable> =
-        Tagged<Domain, Time.Coordinate>
-}
-```
+Continuous and suspending tags prevent accidental mixing. The reference is chosen
+by the provider, not necessarily boot time or the Unix epoch. A shared domain tag
+does not prove that independently selected runtime references agree.
 
-Continuous and suspending instants use different tags. Neither implicitly
-converts to the other, to an untagged coordinate, or to a Unix-epoch instant.
-Explicitly accessing `underlying` or retagging is a deliberate escape from that
-domain distinction; callers must establish the corresponding reference.
-
-Time.Coordinate represents a temporal point relative to an unspecified reference.
-It stores a Swift.Duration displacement from that reference, but is not itself
-a duration: point plus duration produces a point, and point minus point produces
-a duration. Point addition and scaling are not defined.
-
-The coordinate preserves the full signed attosecond range of Swift.Duration.
-Native protocol operations trap on unrepresentable arithmetic; checked methods
-on Time.Coordinate report overflow. Subtraction uses direct subtraction rather
-than negating the duration, including at its minimum value.
-
-The Unix-epoch Instant in swift-time uses the same coordinate implementation
-internally, while preserving its Int64 seconds, exact nanosecond precision,
-normalized fraction, and existing encoded keys. Those Unix-specific constraints
-do not leak into clock instants.
-
-Clock re-exports Time and Tagged so that importing Clock makes its aliased
-instants' operations available, including under MemberImportVisibility.
-
-## References and platform boundary
-
-`Clock.Continuous.Instant.reference` is a coordinate origin, not a clock reading.
-It does not inherently mean boot time or the Unix epoch. A provider must establish
-a consistent reference. Sharing a domain type alone does not make readings from
-different machines, boots, or independently chosen references comparable.
-
-The atom provides no `now`, `sleep`, `minimumResolution`, platform source, or
-Swift.Clock conformance. Higher packages supply those behaviors and are
-responsible for reference consistency, resolution, syscall conversions, sleep,
-and cancellation. Representing attoseconds does not claim attosecond hardware
-resolution.
-
-There is no Clock.Offset or Clock.Nanoseconds, and no alias to a native platform
-clock. Duration is Swift.Duration throughout.
+There is no Clock.Offset, Clock.Nanoseconds, or alias to a platform clock.
 
 ## Deadlines
 
-Clock.Deadline accepts any Swift.InstantProtocol and distinguishes `.at(instant)`
-from `.never`. Each built-in domain exposes its corresponding Deadline alias.
+Clock.Deadline<Instant> represents .at(Instant) or .never with no payload protocol
+requirements. Equality, hashing, and sendability are conditional. Comparable
+payloads support ordering and expiration; never sorts after every finite deadline.
+Only after(_:from:) and remaining(at:) require Swift.InstantProtocol.
 
-```swift
-let start = Clock.Continuous.Instant.reference
-let deadline = Clock.Continuous.Deadline.after(.seconds(2), from: start)
-let remaining: Swift.Duration? = deadline.remaining(at: start)
-let unlimited = Clock.Continuous.Deadline.never
-```
+## Swift interoperability
 
-Finite deadlines expire at equality, with remaining duration clamped to zero.
-Never has no finite instant or remaining duration: both projections return nil.
-It sorts after every finite deadline, including the largest finite coordinate.
-Overflow does not silently become never; negative delays produce past deadlines.
+The swift-time-affine molecule supplies explicit affine arithmetic over Time.Instant.
+The existing Point_Affine tagged-composition helper lifts that relationship to a
+clock domain. No additional instant wrapper is required for this domain model.
 
-## Migration and verification
+Swift.Clock compatibility and any owned protocol adapter are deferred to the
+higher-level provider boundary. Neither importing the atom nor the molecule adds
+Swift.InstantProtocol conformance to the aliases or their generic representation.
 
-Clock instants retain `init(offset:)`, `offset`, and `reference`, supplied by
-Time's tagged-coordinate conveniences. Their `underlying` value is now a
-Time.Coordinate. There is no intermediate tagged `position` property.
+The owned Unix Instant in swift-time retains its intrinsic arithmetic, Unix epoch,
+nanosecond precision, and Swift.InstantProtocol conformance.
 
-Higher-package migration remains separate. Those packages must supply actual
-clock behavior and minimum resolution, and handle optional deadline projections.
+## Verification
 
-Run the Clock, Time, and Calendar tests using the Atoms Temporal Review scheme
-in atoms.xcworkspace. After building, verify the public type boundary:
-
-```sh
-swift Tests/Typechecking/Verify.swift /path/to/DerivedData/Build/Products/Debug
-```
-
-The compiler fixtures verify exact alias identity and valid Swift.Clock clients,
-and reject mixed domains, Unix instants, untagged coordinates, invalid point
-algebra, and runtime access on domain-only clock values.
+Use Atoms Coordinate Review in atoms.xcworkspace for the atoms and their explicit
+composition molecules. Compiler-negative fixtures in Tests/Typechecking run from
+the ordinary Clock test target on macOS: they test programs that must not compile,
+which cannot be included directly in a compiling test target.

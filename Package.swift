@@ -15,6 +15,7 @@ let package = Package(
         .library(name: "Clock", targets: ["Clock"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/swift-atoms/swift-point.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-time.git", branch: "main"),
     ],
@@ -30,6 +31,7 @@ let package = Package(
         .testTarget(
             name: "Clock Tests",
             dependencies: [
+                .product(name: "Point", package: "swift-point"),
                 .target(name: "Clock"),
                 .product(name: "Tagged", package: "swift-tagged"),
                 .product(name: "Time", package: "swift-time"),
