@@ -32,21 +32,21 @@ extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Value
     }
 
     @Test
-    func `Instant advanced by duration`() {
+    func `Advancing an instant adds its supplied duration to the coordinate`() {
         let instant = Clock.Unimplemented.Instant(offset: .seconds(1))
         let advanced = instant.advanced(by: .seconds(2))
         #expect(advanced.offset == .seconds(3))
     }
 
     @Test
-    func `Instant duration to other`() {
+    func `Instants measure the duration between their coordinates`() {
         let a = Clock.Unimplemented.Instant(offset: .seconds(1))
         let b = Clock.Unimplemented.Instant(offset: .seconds(4))
         #expect(a.duration(to: b) == .seconds(3))
     }
 
     @Test
-    func `Instant ordering`() {
+    func `Instants compare in coordinate order`() {
         let a = Clock.Unimplemented.Instant(offset: .seconds(1))
         let b = Clock.Unimplemented.Instant(offset: .seconds(2))
         #expect(a < b)
@@ -54,7 +54,7 @@ extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Value
     }
 
     @Test
-    func `Instant equality`() {
+    func `Instants with equal coordinates compare equal`() {
         let a = Clock.Unimplemented.Instant(offset: .seconds(5))
         let b = Clock.Unimplemented.Instant(offset: .seconds(5))
         #expect(a == b)
@@ -70,7 +70,7 @@ extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Value
 
 extension Clock.Unimplemented.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
-    func `Instant advanced by zero`() {
+    func `Advancing an instant by zero preserves equality`() {
         let instant = Clock.Unimplemented.Instant(offset: .seconds(1))
         let advanced = instant.advanced(by: .zero)
         #expect(advanced == instant)

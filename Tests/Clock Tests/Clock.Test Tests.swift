@@ -20,7 +20,7 @@ extension Clock.Test.`Clock operations preserve their contracts`.`Values preserv
     }
 
     @Test
-    func `init with custom now`() {
+    func `Clock construction preserves the supplied current instant`() {
         let instant = Clock.Test.Instant(offset: .seconds(10))
         let clock = Clock.Test(now: instant)
         #expect(clock.now.offset == .seconds(10))
@@ -33,7 +33,7 @@ extension Clock.Test.`Clock operations preserve their contracts`.`Values preserv
     }
 
     @Test
-    func `minimumResolution setter`() {
+    func `Assigning the minimum resolution retains the supplied duration`() {
         let clock = Clock.Test()
         clock.minimumResolution = .milliseconds(16)
         #expect(clock.minimumResolution == .milliseconds(16))
@@ -62,21 +62,21 @@ extension Clock.Test.`Clock operations preserve their contracts`.`Values preserv
     }
 
     @Test
-    func `Instant advanced by duration`() {
+    func `Advancing an instant adds its supplied duration to the coordinate`() {
         let instant = Clock.Test.Instant(offset: .seconds(1))
         let advanced = instant.advanced(by: .seconds(2))
         #expect(advanced.offset == .seconds(3))
     }
 
     @Test
-    func `Instant duration to other`() {
+    func `Instants measure the duration between their coordinates`() {
         let a = Clock.Test.Instant(offset: .seconds(1))
         let b = Clock.Test.Instant(offset: .seconds(4))
         #expect(a.duration(to: b) == .seconds(3))
     }
 
     @Test
-    func `Instant ordering`() {
+    func `Instants compare in coordinate order`() {
         let a = Clock.Test.Instant(offset: .seconds(1))
         let b = Clock.Test.Instant(offset: .seconds(2))
         #expect(a < b)
@@ -84,7 +84,7 @@ extension Clock.Test.`Clock operations preserve their contracts`.`Values preserv
     }
 
     @Test
-    func `Instant equality`() {
+    func `Instants with equal coordinates compare equal`() {
         let a = Clock.Test.Instant(offset: .seconds(5))
         let b = Clock.Test.Instant(offset: .seconds(5))
         #expect(a == b)
@@ -100,14 +100,14 @@ extension Clock.Test.`Clock operations preserve their contracts`.`Values preserv
 
 extension Clock.Test.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
-    func `advance by zero`() {
+    func `Advancing the test clock by zero preserves its current instant`() {
         let clock = Clock.Test()
         clock.advance(by: .zero)
         #expect(clock.now.offset == .zero)
     }
 
     @Test
-    func `Instant advanced by zero`() {
+    func `Advancing an instant by zero preserves equality`() {
         let instant = Clock.Test.Instant(offset: .seconds(1))
         let advanced = instant.advanced(by: .zero)
         #expect(advanced == instant)

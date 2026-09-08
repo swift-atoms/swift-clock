@@ -36,7 +36,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Values preserve their
     }
 
     @Test
-    func `type-erased instant equality`() {
+    func `Erased instants read from unchanged clock state compare equal`() {
         let immediate = Clock.Immediate()
         let erased = Clock.Any(immediate)
         let a = erased.now
@@ -45,7 +45,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Values preserve their
     }
 
     @Test
-    func `type-erased instant ordering`() {
+    func `Erased instants order an advanced instant after its source`() {
         let immediate = Clock.Immediate()
         let erased = Clock.Any(immediate)
         let a = erased.now
@@ -64,7 +64,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Values preserve their
     }
 
     @Test
-    func `type-erased instant duration to other`() {
+    func `Erased instants measure the duration used to advance them`() {
         let immediate = Clock.Immediate()
         let erased = Clock.Any(immediate)
         let a = erased.now
@@ -75,7 +75,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Values preserve their
 
 extension `Erased clocks preserve their wrapped behavior`.`Boundary values preserve their contracts` {
     @Test
-    func `type-erased instant advanced by zero`() {
+    func `Advancing an erased instant by zero preserves equality`() {
         let immediate = Clock.Immediate()
         let erased = Clock.Any(immediate)
         let a = erased.now
@@ -101,7 +101,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Boundary values prese
 
 extension `Erased clocks preserve their wrapped behavior`.`Operations compose correctly` {
     @Test
-    func `wrapping Test clock: sleep and advance`() async throws {
+    func `Advancing a wrapped test clock resumes its erased sleep`() async throws {
         let test = Clock.Test()
         let erased = Clock.Any(test)
         let resumed = Locked(initialState: false)
@@ -118,7 +118,7 @@ extension `Erased clocks preserve their wrapped behavior`.`Operations compose co
     }
 
     @Test
-    func `sequential sleeps through type-erased Immediate`() async throws {
+    func `Sequential erased sleeps advance the wrapped immediate clock cumulatively`() async throws {
         let immediate = Clock.Immediate()
         let erased = Clock.Any(immediate)
 

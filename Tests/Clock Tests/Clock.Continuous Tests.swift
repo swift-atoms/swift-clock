@@ -26,14 +26,14 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Values p
     }
 
     @Test
-    func `Instant advanced by positive duration`() {
+    func `Advancing an instant by a positive duration increases its coordinate`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 1_000_000_000)
         let advanced = instant.advanced(by: .seconds(2))
         #expect(advanced.nanoseconds == 3_000_000_000)
     }
 
     @Test
-    func `Instant advanced by negative duration`() {
+    func `Advancing an instant by a negative duration decreases its coordinate`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 3_000_000_000)
         let advanced = instant.advanced(by: .seconds(-1))
         #expect(advanced.nanoseconds == 2_000_000_000)
@@ -54,7 +54,7 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Values p
     }
 
     @Test
-    func `Instant ordering`() {
+    func `Instants compare in coordinate order`() {
         let a = Clock.Continuous.Instant(nanoseconds: 100)
         let b = Clock.Continuous.Instant(nanoseconds: 200)
         #expect(a < b)
@@ -63,7 +63,7 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Values p
     }
 
     @Test
-    func `Instant equality`() {
+    func `Instants with equal coordinates compare equal`() {
         let a = Clock.Continuous.Instant(nanoseconds: 42)
         let b = Clock.Continuous.Instant(nanoseconds: 42)
         let c = Clock.Continuous.Instant(nanoseconds: 43)
@@ -79,7 +79,7 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Values p
     }
 
     @Test
-    func `Instant advanced by sub-second duration`() {
+    func `Advancing an instant preserves a fractional second duration`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 0)
         let advanced = instant.advanced(by: .milliseconds(500))
         #expect(advanced.nanoseconds == 500_000_000)
@@ -88,7 +88,7 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Values p
 
 extension Clock.Continuous.`Clock operations preserve their contracts`.`Boundary values preserve their contracts` {
     @Test
-    func `Instant advanced by zero duration`() {
+    func `Advancing an instant by zero duration preserves its value`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 42)
         let advanced = instant.advanced(by: .zero)
         #expect(advanced == instant)
@@ -101,20 +101,20 @@ extension Clock.Continuous.`Clock operations preserve their contracts`.`Boundary
     }
 
     @Test
-    func `Instant zero nanoseconds`() {
+    func `An instant constructed from zero nanoseconds stores zero`() {
         let instant = Clock.Continuous.Instant(nanoseconds: 0)
         #expect(instant.nanoseconds == 0)
     }
 
     @Test
-    func `Instant wrapping arithmetic on large values`() {
+    func `Advancing a maximum nanosecond instant by one nanosecond wraps to zero`() {
         let instant = Clock.Continuous.Instant(nanoseconds: .max)
         let advanced = instant.advanced(by: .nanoseconds(1))
         #expect(advanced.nanoseconds == 0)
     }
 
     @Test
-    func `Instant round-trip: advance then measure duration`() {
+    func `Measuring an advanced instant recovers its displacement`() {
         let start = Clock.Continuous.Instant(nanoseconds: 1000)
         let duration: Duration = .milliseconds(250)
         let end = start.advanced(by: duration)
