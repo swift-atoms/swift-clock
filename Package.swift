@@ -18,6 +18,8 @@ let package = Package(
         .library(name: "Clock Test Support", targets: ["Clock Test Support"]),
     ],
     dependencies: [
+
+        .package(url: "https://github.com/swift-atoms/swift-carrier.git", branch: "main"),
         .package(
             url: "https://github.com/swift-atoms/swift-tagged.git",
             branch: "main"
@@ -27,6 +29,7 @@ let package = Package(
         .target(
             name: "Clock",
             dependencies: [
+                .product(name: "Carrier", package: "swift-carrier"),
                 .product(name: "Tagged", package: "swift-tagged"),
             ],
             path: "Sources/Clock"
@@ -55,6 +58,12 @@ let package = Package(
                 .target(name: "Clock Foundation Integration"),
             ],
             path: "Tests/Clock Tests"
+        ),
+        .testTarget(
+            name: "Consolidated Clock Carrier Tests",
+            dependencies: [
+.target(name: "Clock"), .product(name: "Carrier", package: "swift-carrier")],
+            path: "Tests/Consolidated swift-clock-carrier"
         ),
     ],
     swiftLanguageModes: [.v6]
