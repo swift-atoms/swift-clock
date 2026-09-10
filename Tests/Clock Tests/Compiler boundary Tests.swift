@@ -4,8 +4,6 @@ import Testing
 
 private final class CompilerBoundaryBundle: NSObject {}
 
-/// Compiler-negative fixtures cannot be compiled into this target themselves.
-/// Running their verifier here makes them part of ordinary workspace/SwiftPM tests.
 @Test
 func `The compiler enforces domain and dimension boundaries`() throws {
     let tests = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()

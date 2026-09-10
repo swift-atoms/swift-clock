@@ -2,8 +2,7 @@ public import Tagged
 public import Time
 
 extension Clock {
-    /// The domain of a clock that continues advancing during system suspension.
-    /// A platform implementation supplies its reference, readings, and resolution.
+
     public struct Continuous: Sendable {
         @inlinable
         public init() {}

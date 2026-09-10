@@ -1,4 +1,3 @@
-// expected-error: and 'Cardinal' be equivalent
 import Clock
 
 let instant = Clock.Continuous.Instant.reference

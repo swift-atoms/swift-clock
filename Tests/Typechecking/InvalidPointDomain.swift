@@ -1,4 +1,3 @@
-// expected-error: cannot assign value of type
 import Point
 import Vector
 import Tagged

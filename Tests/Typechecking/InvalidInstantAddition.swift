@@ -1,4 +1,3 @@
-// expected-error: binary operator '+' cannot be applied
 import Clock
 
 let first = Clock.Continuous.Instant.reference

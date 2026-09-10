@@ -1,6 +1,5 @@
 extension Clock {
-    /// A finite deadline, or an explicit absence of expiration.
-    /// Representation does not require instant arithmetic.
+
     public enum Deadline<Instant> {
         case at(Instant)
         case never
@@ -39,7 +38,6 @@ extension Clock.Deadline: Comparable where Instant: Comparable {
 extension Clock.Deadline where Instant: Swift.InstantProtocol {
     public typealias Duration = Instant.Duration
 
-    /// Uses the instant's arithmetic contract; overflow is not infinity.
     @inlinable public static func after(_ duration: Duration, from instant: Instant) -> Self {
         .at(instant.advanced(by: duration))
     }

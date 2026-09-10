@@ -1,4 +1,3 @@
-// Run with: swift Tests/Typechecking/Verify.swift /path/to/Build/Products/Debug
 import Foundation
 
 struct VerificationFailure: Error, CustomStringConvertible {

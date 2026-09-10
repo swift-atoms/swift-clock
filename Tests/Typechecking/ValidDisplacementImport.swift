@@ -1,6 +1,5 @@
 import Displacement
 
-// No separate Vector import: storage interoperability is part of the public surface.
 let storage = Vector(x: 1, y: 2, z: 3)
 let value = Displacement(components: storage)
 let natural: Displacement<3, Int> = .init(dx: 1, dy: 2, dz: 3)

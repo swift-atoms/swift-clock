@@ -1,4 +1,3 @@
-// expected-error: cannot assign value of type
 import Clock
 import Time
 

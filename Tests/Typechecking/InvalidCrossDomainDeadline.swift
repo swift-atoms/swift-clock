@@ -1,4 +1,3 @@
-// expected-error: cannot convert value of type
 import Clock
 
 let deadline = Clock.Continuous.Deadline.never

@@ -17,8 +17,7 @@ private final class OpaquePayload { var value = 0 }
     #expect(!Clock.Deadline<Int>.never.hasExpired(at: .max))
     #expect(Set([first, first, last]).count == 2)
 }
-// An independent instant and duration pair exercises the generic deadline
-// contract without relying on Swift.Duration or Clock.Instant.
+
 private struct TickDuration: Swift.DurationProtocol, Hashable {
     let count: Int
     static let zero = Self(count: 0)
