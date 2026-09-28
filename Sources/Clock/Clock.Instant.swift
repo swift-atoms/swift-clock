@@ -3,5 +3,5 @@
 
 extension Clock {
 
-    public typealias Instant<Domain: ~Copyable & ~Escapable> = Tagged<Domain, Time.Instant>
+    public typealias Instant<Domain: ~Copyable & ~Escapable> = Tagged<Domain, Time.Coordinate>
 }

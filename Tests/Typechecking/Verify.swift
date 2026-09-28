@@ -42,10 +42,11 @@ func verify() throws {
     guard !validFixtures.isEmpty else {
         throw VerificationFailure(description: "No valid compiler fixtures were found")
     }
+    var failures: [String] = []
     for fixture in validFixtures {
         let result = try typecheck(fixture)
-        guard result.status == 0 else {
-            throw VerificationFailure(description: "Valid client \(fixture.lastPathComponent) failed:\n\(result.diagnostics)")
+        if result.status != 0 {
+            failures.append("Valid client \(fixture.lastPathComponent) failed:\n\(result.diagnostics)")
         }
     }
     let invalid = try FileManager.default.contentsOfDirectory(
@@ -65,9 +66,12 @@ func verify() throws {
         }
         let expected = String(firstLine.dropFirst(prefix.count))
         let result = try typecheck(fixture)
-        guard result.status != 0, result.diagnostics.contains(expected) else {
-            throw VerificationFailure(description: "Unexpected result for \(fixture.lastPathComponent):\n\(result.diagnostics)")
+        if result.status == 0 || !result.diagnostics.contains(expected) {
+            failures.append("Unexpected result for \(fixture.lastPathComponent):\n\(result.diagnostics)")
         }
+    }
+    guard failures.isEmpty else {
+        throw VerificationFailure(description: failures.joined(separator: "\n"))
     }
     print("Clock domain boundary: valid client accepted; \(invalid.count) invalid programs rejected.")
 }

@@ -1,3 +1,4 @@
+// expected-error: cannot assign value of type 'Tagged<World, Point<2, Int>>' to type 'Tagged<Screen, Point<2, Int>>'
 import Point
 import Vector
 import Tagged

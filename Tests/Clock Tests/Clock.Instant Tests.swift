@@ -11,7 +11,7 @@ private func sendable<T: Sendable>(_ value: T) -> T { value }
     let coordinate = Time.Coordinate(offset: .seconds(5))
     let tagged = Tagged<Clock.Continuous, Time.Coordinate>(_unchecked: coordinate)
     let instant: Clock.Continuous.Instant = tagged
-    let sameTagged: Tagged<Clock.Continuous, Time.Instant> = instant
+    let sameTagged: Tagged<Clock.Continuous, Time.Coordinate> = instant
     #expect(instant.underlying == coordinate)
     #expect(sameTagged == tagged)
 }

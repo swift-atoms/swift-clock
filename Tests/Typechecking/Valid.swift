@@ -10,7 +10,7 @@ struct LocalDomain: ~Copyable {}
 func requireSendable<Value: Sendable>(_ value: Value) -> Value { value }
 let first = Clock.Continuous.Instant.reference
 let later = Clock.Continuous.Instant(offset: .seconds(2))
-let tagged: Tagged<Clock.Continuous, Time.Instant> = later
+let tagged: Tagged<Clock.Continuous, Time.Coordinate> = later
 let sameInstant: Clock.Continuous.Instant = tagged
 let coordinate: Time.Coordinate = later.underlying
 let deadline: Clock.Deadline<Clock.Continuous.Instant> = .at(later)
@@ -29,5 +29,5 @@ let one = Point(coordinates: Vector<1, Int>([1]))
 let three = Coordinate(components: Vector<3, Int>([1, 2, 3]))
 let many = Point(coordinates: Vector<8, Int>(repeating: 0))
 
-let timeInstant: Time.Instant = coordinate
+let timeInstant: Time.Coordinate = coordinate
 let backToCoordinate: Time.Coordinate = timeInstant
