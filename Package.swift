@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "Clock", targets: ["Clock"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-atoms/swift-point.git", branch: "main"),
+        .package(url: "https://github.com/swift-atoms/swift-point.git", branch: "main", traits: ["Affine"]),
         .package(url: "https://github.com/swift-atoms/swift-tagged.git", branch: "main"),
         .package(url: "https://github.com/swift-atoms/swift-time.git", branch: "main"),
     ],
