@@ -24,7 +24,7 @@ let unconstrained = Clock.Deadline(Payload())
 enum Screen {}
 let screen = Tagged<Screen, Point<2, Int>>(_unchecked: Point(coordinates: Vector([1, 2])))
 let shift = Displacement(components: Vector<2, Int>([3, 4]))
-let temporal: Tagged<Time, Coordinate::Coordinate<1, Swift.Duration>> = Time.Coordinate.reference
+let temporal: Tagged<Time, Coordinate::Coordinate<1, Swift::Duration>> = Time.Coordinate.reference
 let one = Point(coordinates: Vector<1, Int>([1]))
 let three = Coordinate(components: Vector<3, Int>([1, 2, 3]))
 let many = Point(coordinates: Vector<8, Int>(repeating: 0))

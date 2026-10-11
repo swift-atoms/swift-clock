@@ -1,5 +1,5 @@
 public import Tagged
-public import Time
+internal import Time
 
 extension Clock {
 
@@ -10,7 +10,7 @@ extension Clock {
 }
 
 extension Clock.Suspending {
-    public typealias Duration = Swift.Duration
+    public typealias Duration = Swift::Duration
     public typealias Instant = Clock.Instant<Self>
     public typealias Deadline = Clock.Deadline<Instant>
 }

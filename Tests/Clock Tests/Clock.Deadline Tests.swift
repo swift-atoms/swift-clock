@@ -18,8 +18,11 @@ private final class OpaquePayload { var value = 0 }
     #expect(Set([first, first, last]).count == 2)
 }
 
-private struct TickDuration: Swift.DurationProtocol, Hashable {
+private struct TickDuration: Swift::DurationProtocol, Hashable {
     let count: Int
+}
+
+extension TickDuration {
     static let zero = Self(count: 0)
     static func < (lhs: Self, rhs: Self) -> Bool { lhs.count < rhs.count }
     static func + (lhs: Self, rhs: Self) -> Self { Self(count: lhs.count + rhs.count) }
@@ -31,8 +34,11 @@ private struct TickDuration: Swift.DurationProtocol, Hashable {
     static func /= (lhs: inout Self, rhs: Int) { lhs = lhs / rhs }
 }
 
-private struct TickInstant: Swift.InstantProtocol {
+private struct TickInstant: Swift::InstantProtocol {
     let tick: Int
+}
+
+extension TickInstant {
     func advanced(by duration: TickDuration) -> Self { Self(tick: tick + duration.count) }
     func duration(to other: Self) -> TickDuration { TickDuration(count: other.tick - tick) }
     static func < (lhs: Self, rhs: Self) -> Bool { lhs.tick < rhs.tick }

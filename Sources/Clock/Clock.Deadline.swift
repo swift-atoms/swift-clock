@@ -35,7 +35,7 @@ extension Clock.Deadline: Comparable where Instant: Comparable {
         }
     }
 }
-extension Clock.Deadline where Instant: Swift.InstantProtocol {
+extension Clock.Deadline where Instant: Swift::InstantProtocol {
     public typealias Duration = Instant.Duration
 
     @inlinable public static func after(_ duration: Duration, from instant: Instant) -> Self {
