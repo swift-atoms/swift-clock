@@ -6,7 +6,9 @@ struct VerificationFailure: Error, CustomStringConvertible {
 
 func verify() throws {
     guard CommandLine.arguments.count == 2 else {
-        throw VerificationFailure(description: "Pass the atoms workspace Build/Products/Debug directory")
+        throw VerificationFailure(
+            description: "Pass the atoms workspace Build/Products/Debug directory"
+        )
     }
     let products = URL(fileURLWithPath: CommandLine.arguments[1]).path
     let fixtures = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
@@ -22,7 +24,8 @@ func verify() throws {
             "-enable-upcoming-feature", "MemberImportVisibility",
             "-enable-upcoming-feature", "InternalImportsByDefault",
             "-enable-experimental-feature", "Lifetimes",
-            "-I", products, "-I", URL(fileURLWithPath: products).appendingPathComponent("Modules").path,
+            "-I", products, "-I",
+            URL(fileURLWithPath: products).appendingPathComponent("Modules").path,
             "-module-cache-path", scratch.appendingPathComponent("modules").path,
             fixture.path,
         ]
@@ -36,7 +39,8 @@ func verify() throws {
     }
 
     let validFixtures = try FileManager.default.contentsOfDirectory(
-        at: fixtures, includingPropertiesForKeys: nil
+        at: fixtures,
+        includingPropertiesForKeys: nil
     ).filter { $0.lastPathComponent.hasPrefix("Valid") && $0.pathExtension == "swift" }
         .sorted { $0.lastPathComponent < $1.lastPathComponent }
     guard !validFixtures.isEmpty else {
@@ -46,11 +50,14 @@ func verify() throws {
     for fixture in validFixtures {
         let result = try typecheck(fixture)
         if result.status != 0 {
-            failures.append("Valid client \(fixture.lastPathComponent) failed:\n\(result.diagnostics)")
+            failures.append(
+                "Valid client \(fixture.lastPathComponent) failed:\n\(result.diagnostics)"
+            )
         }
     }
     let invalid = try FileManager.default.contentsOfDirectory(
-        at: fixtures, includingPropertiesForKeys: nil
+        at: fixtures,
+        includingPropertiesForKeys: nil
     ).filter { $0.lastPathComponent.hasPrefix("Invalid") && $0.pathExtension == "swift" }
         .sorted { $0.lastPathComponent < $1.lastPathComponent }
     guard !invalid.isEmpty else {
@@ -62,18 +69,24 @@ func verify() throws {
         guard let firstLine = source.split(separator: "\n").first,
             firstLine.hasPrefix(prefix)
         else {
-            throw VerificationFailure(description: "Missing diagnostic expectation: \(fixture.path)")
+            throw VerificationFailure(
+                description: "Missing diagnostic expectation: \(fixture.path)"
+            )
         }
         let expected = String(firstLine.dropFirst(prefix.count))
         let result = try typecheck(fixture)
         if result.status == 0 || !result.diagnostics.contains(expected) {
-            failures.append("Unexpected result for \(fixture.lastPathComponent):\n\(result.diagnostics)")
+            failures.append(
+                "Unexpected result for \(fixture.lastPathComponent):\n\(result.diagnostics)"
+            )
         }
     }
     guard failures.isEmpty else {
         throw VerificationFailure(description: failures.joined(separator: "\n"))
     }
-    print("Clock domain boundary: valid client accepted; \(invalid.count) invalid programs rejected.")
+    print(
+        "Clock domain boundary: valid client accepted; \(invalid.count) invalid programs rejected."
+    )
 }
 
 do {

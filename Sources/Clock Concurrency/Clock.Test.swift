@@ -85,7 +85,8 @@
                 },
                 onCancel: {
                     let toResume: CheckedContinuation<Void, Never>? = state.withLock { state in
-                        guard let index = state.suspensions.firstIndex(where: { $0.id == id }) else {
+                        guard let index = state.suspensions.firstIndex(where: { $0.id == id })
+                        else {
                             return nil
                         }
                         return state.suspensions.remove(at: index).continuation

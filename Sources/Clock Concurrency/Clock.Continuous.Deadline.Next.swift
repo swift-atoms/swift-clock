@@ -13,7 +13,8 @@
                 valueStorage.store(
                     deadline.instant.map { instant in
                         let (seconds, attoseconds) = instant.offset.components
-                        return UInt64(clamping: seconds) &* 1_000_000_000 &+ UInt64(clamping: attoseconds / 1_000_000_000)
+                        return UInt64(clamping: seconds) &* 1_000_000_000
+                            &+ UInt64(clamping: attoseconds / 1_000_000_000)
                     } ?? .max,
                     ordering: .releasing
                 )

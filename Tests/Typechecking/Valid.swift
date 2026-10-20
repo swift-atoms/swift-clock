@@ -1,9 +1,9 @@
 import Clock
-import Tagged
-import Time
-import Point
 import Coordinate
 import Displacement
+import Point
+import Tagged
+import Time
 import Vector
 
 struct LocalDomain: ~Copyable {}
