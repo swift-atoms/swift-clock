@@ -1,6 +1,6 @@
-import Time
 import Clock_Concurrency
 import Testing
+import Time
 
 @Suite
 struct `Clock.Immediate` {
