@@ -13,6 +13,7 @@ let package = Package(
     ],
     products: [
         .library(name: "Clock", targets: ["Clock"]),
+        .library(name: "Clock Concurrency", targets: ["Clock Concurrency"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swift-atoms/swift-point.git", branch: "main", traits: ["Affine"]),
@@ -28,6 +29,15 @@ let package = Package(
             ],
             path: "Sources/Clock"
         ),
+        .target(
+            name: "Clock Concurrency",
+            dependencies: [
+                .target(name: "Clock"),
+                .product(name: "Tagged", package: "swift-tagged"),
+                .product(name: "Time", package: "swift-time"),
+            ],
+            path: "Sources/Clock Concurrency"
+        ),
         .testTarget(
             name: "Clock Tests",
             dependencies: [
@@ -37,6 +47,14 @@ let package = Package(
                 .product(name: "Time", package: "swift-time"),
             ],
             path: "Tests/Clock Tests"
+        ),
+        .testTarget(
+            name: "Clock Concurrency Tests",
+            dependencies: [
+                .target(name: "Clock Concurrency"),
+                .product(name: "Time", package: "swift-time"),
+            ],
+            path: "Tests/Clock Concurrency Tests"
         ),
     ],
     swiftLanguageModes: [.v6]
