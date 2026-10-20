@@ -66,8 +66,7 @@ func verify() throws {
     for fixture in invalid {
         let source = try String(contentsOf: fixture, encoding: .utf8)
         let prefix = "// expected-error: "
-        guard let firstLine = source.split(separator: "\n").first,
-            firstLine.hasPrefix(prefix)
+        guard let firstLine = source.split(separator: "\n").first(where: { $0.hasPrefix(prefix) })
         else {
             throw VerificationFailure(
                 description: "Missing diagnostic expectation: \(fixture.path)"
