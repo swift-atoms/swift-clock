@@ -1,34 +1,43 @@
 #if !hasFeature(Embedded)
     extension Clock {
-        public struct `Any`<D: DurationProtocol & Hashable>: _Concurrency.Clock, Sendable {
+        public struct `Any`<D: DurationProtocol & Hashable>: Clock.Nonsending, Sendable {
             public struct Instant: InstantProtocol, Sendable {
                 fileprivate let box: any Clock.InstantBox<D>
             }
 
             private let _now: @Sendable () -> Instant
             private let _minimumResolution: @Sendable () -> D
-            private let _sleep: nonisolated(nonsending) @Sendable (Instant, D?) async throws -> Void
+            private let _sleep: @Sendable (Instant, D?, isolated (any Actor)?) async throws -> Void
 
             public var now: Instant { _now() }
 
             public var minimumResolution: D { _minimumResolution() }
 
-            public init<C: _Concurrency.Clock>(_ clock: C)
+            /// Wraps `clock`, whose sleeps keep the caller's actor (``Clock/Nonsending``).
+            public init<C: Clock.Nonsending>(_ clock: C)
             where C.Duration == D, C: Sendable, C.Instant: Sendable {
                 self._now = { Instant(box: Instant.Box(clock.now)) }
                 self._minimumResolution = { clock.minimumResolution }
-                self._sleep = { deadline, tolerance in
+                self._sleep = { deadline, tolerance, isolation in
                     guard let box = deadline.box as? Instant.Box<C.Instant> else {
                         preconditionFailure("Mismatched clock instant types")
                     }
-                    try await clock.sleep(until: box.instant, tolerance: tolerance)
+                    try await clock.sleep(until: box.instant, tolerance: tolerance, isolation: isolation)
                 }
             }
 
             nonisolated(nonsending)
                 public func sleep(until deadline: Instant, tolerance: D? = nil) async throws
             {
-                try await _sleep(deadline, tolerance)
+                try await sleep(until: deadline, tolerance: tolerance, isolation: #isolation)
+            }
+
+            public func sleep(
+                until deadline: Instant,
+                tolerance: D?,
+                isolation: isolated (any Actor)?
+            ) async throws {
+                try await _sleep(deadline, tolerance, isolation)
             }
         }
     }

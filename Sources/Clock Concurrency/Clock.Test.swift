@@ -4,7 +4,14 @@
     public import Time
 
     extension Clock {
-        public final class Test: _Concurrency.Clock, Sendable {
+        /// A clock whose time moves only when a test moves it, as Point-Free's `TestClock` (swift-clocks 2).
+        ///
+        /// A sleep remembers the actor it was called from. Advancing the clock resumes each sleep that is due, in
+        /// deadline order, on that actor, and waits until the sleeper has run up to its next suspension: another
+        /// sleep, or the end of its work. When `advance` returns, every effect of the wake-up has landed, however the
+        /// tasks involved are scheduled. A sleep from a nonisolated context has no actor to wait on, so it cannot be
+        /// tested deterministically and stops the program.
+        public final class Test: Clock.Nonsending, Sendable {
             private let state: Mutex<State>
 
             public init(now: Instant = .init(Time.Instant(secondsSinceUnixEpoch: 0))) {
@@ -13,7 +20,8 @@
                         now: now,
                         minimumResolution: .zero,
                         nextID: 0,
-                        suspensions: []
+                        suspensions: [],
+                        advancements: [:]
                     )
                 )
             }
@@ -28,6 +36,8 @@
             var minimumResolution: Duration
             var nextID: UInt64
             var suspensions: [Entry]
+            /// The advances waiting for a woken sleep to return, keyed by that sleep's id.
+            var advancements: [UInt64: CheckedContinuation<Void, Never>]
         }
     }
 
@@ -35,6 +45,7 @@
         struct Entry: Sendable {
             let id: UInt64
             let deadline: Clock.Test.Instant
+            let isolation: any Actor
             let continuation: CheckedContinuation<Void, Never>
         }
     }
@@ -55,12 +66,34 @@
                 tolerance: Duration? = nil
             ) async throws
         {
+            try await sleep(until: deadline, tolerance: tolerance, isolation: #isolation)
+        }
+
+        public func sleep(
+            until deadline: Instant,
+            tolerance: Duration?,
+            isolation: isolated (any Actor)?
+        ) async throws {
             try Task.checkCancellation()
+            // Not `guard let`: a sleep that binds its isolated parameter to a local no longer resumes on that actor
+            // (Swift 6.4.2), and its advance then returns before the sleeper has run.
+            guard isolation != nil else {
+                preconditionFailure(
+                    """
+                    'Clock.Test' cannot sleep in nonisolated contexts because it cannot be deterministically \
+                    tested. Call 'sleep' from actor-isolated code.
+                    """
+                )
+            }
 
             let id = state.withLock { state -> UInt64 in
                 let id = state.nextID
                 state.nextID &+= 1
                 return id
+            }
+            defer {
+                let advancement = state.withLock { $0.advancements.removeValue(forKey: id) }
+                advancement?.resume()
             }
 
             await withTaskCancellationHandler(
@@ -68,11 +101,12 @@
                     await withCheckedContinuation {
                         (continuation: CheckedContinuation<Void, Never>) in
                         let resumeImmediately = state.withLock { state -> Bool in
-                            guard !Task.isCancelled, state.now < deadline else { return true }
+                            guard !Task.isCancelled, deadline >= state.now else { return true }
                             state.suspensions.append(
                                 State.Entry(
                                     id: id,
                                     deadline: deadline,
+                                    isolation: isolation!,
                                     continuation: continuation
                                 )
                             )
@@ -93,60 +127,45 @@
                     }
                     toResume?.resume()
                 },
-                isolation: #isolation
+                isolation: isolation
             )
 
             try Task.checkCancellation()
         }
 
-        public func advance(by duration: Duration = .zero) {
+        /// Moves the clock forward by `duration`, waking each sleep due by then (see ``Clock/Test``).
+        public func advance(by duration: Duration = .zero) async {
             precondition(duration >= .zero, "A test clock cannot move backwards")
-
-            let toResume: [CheckedContinuation<Void, Never>] = state.withLock { state in
-                let deadline = state.now.advanced(by: duration)
-                state.now = deadline
-                state.suspensions.sort { $0.deadline < $1.deadline }
-                var ready: [CheckedContinuation<Void, Never>] = []
-                while let head = state.suspensions.first, head.deadline <= deadline {
-                    ready.append(head.continuation)
-                    state.suspensions.removeFirst()
-                }
-                return ready
-            }
-            for continuation in toResume {
-                continuation.resume()
-            }
+            await advance(to: now.advanced(by: duration))
         }
 
-        public func advance(to deadline: Instant) {
-            let toResume: [CheckedContinuation<Void, Never>] = state.withLock { state in
+        /// Moves the clock forward to `deadline`, waking each sleep due by then (see ``Clock/Test``).
+        public func advance(to deadline: Instant) async {
+            while let entry = state.withLock({ state -> State.Entry? in
                 precondition(deadline >= state.now, "A test clock cannot move backwards")
-                state.now = deadline
-                state.suspensions.sort { $0.deadline < $1.deadline }
-                var ready: [CheckedContinuation<Void, Never>] = []
-                while let head = state.suspensions.first, head.deadline <= deadline {
-                    ready.append(head.continuation)
-                    state.suspensions.removeFirst()
+                guard
+                    let index = state.suspensions.indices.min(by: {
+                        (state.suspensions[$0].deadline, state.suspensions[$0].id)
+                            < (state.suspensions[$1].deadline, state.suspensions[$1].id)
+                    }),
+                    state.suspensions[index].deadline <= deadline
+                else {
+                    state.now = deadline
+                    return nil
                 }
-                return ready
-            }
-            for continuation in toResume {
-                continuation.resume()
+                state.now = state.suspensions[index].deadline
+                return state.suspensions.remove(at: index)
+            }) {
+                await entry.isolation.run { _ in await self.wake(entry) }
             }
         }
 
-        public func run() {
-            let toResume: [CheckedContinuation<Void, Never>] = state.withLock { state in
-                state.suspensions.sort { $0.deadline < $1.deadline }
-                if let last = state.suspensions.last, last.deadline > state.now {
-                    state.now = last.deadline
-                }
-                let all = state.suspensions.map(\.continuation)
-                state.suspensions.removeAll()
-                return all
-            }
-            for continuation in toResume {
-                continuation.resume()
+        /// Advances the clock until no sleep is pending, including the sleeps that woken work starts.
+        ///
+        /// Work that sleeps forever keeps this from returning.
+        public func run() async {
+            while let deadline = state.withLock({ $0.suspensions.map(\.deadline).min() }) {
+                await advance(to: deadline)
             }
         }
 
@@ -154,6 +173,15 @@
             let hasActive = state.withLock { !$0.suspensions.isEmpty }
             guard !hasActive else {
                 throw Suspension.Error()
+            }
+        }
+
+        /// Resumes `entry` and returns once its sleep has returned. It runs on the sleeper's actor, so that is once the
+        /// sleeper has suspended again or finished, since it holds the actor until then.
+        private func wake(_ entry: State.Entry) async {
+            await withCheckedContinuation { (advancement: CheckedContinuation<Void, Never>) in
+                state.withLock { $0.advancements[entry.id] = advancement }
+                entry.continuation.resume()
             }
         }
     }
@@ -164,5 +192,11 @@
 
     extension Clock.Test.Suspension {
         public struct Error: Swift.Error, Sendable {}
+    }
+
+    extension Actor {
+        fileprivate func run(_ operation: @Sendable (isolated Self) async -> Void) async {
+            await operation(self)
+        }
     }
 #endif
