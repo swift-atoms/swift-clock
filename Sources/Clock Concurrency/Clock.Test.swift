@@ -69,14 +69,16 @@
             try await sleep(until: deadline, tolerance: tolerance, isolation: #isolation)
         }
 
+        /// Sleeps until the clock reaches `deadline`, remembering `isolation` to resume on.
+        ///
+        /// `isolation` is checked, not bound with `guard let`: with Swift 6.4.2 a sleep that binds its isolated
+        /// parameter to a local no longer resumes on that actor, and its advance then returns before the sleeper ran.
         public func sleep(
             until deadline: Instant,
             tolerance: Duration?,
             isolation: isolated (any Actor)?
         ) async throws {
             try Task.checkCancellation()
-            // Not `guard let`: a sleep that binds its isolated parameter to a local no longer resumes on that actor
-            // (Swift 6.4.2), and its advance then returns before the sleeper has run.
             guard isolation != nil else {
                 preconditionFailure(
                     """
