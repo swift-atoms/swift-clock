@@ -103,7 +103,7 @@
                     await withCheckedContinuation {
                         (continuation: CheckedContinuation<Void, Never>) in
                         let resumeImmediately = state.withLock { state -> Bool in
-                            guard !Task.isCancelled, deadline >= state.now else { return true }
+                            guard !Task.isCancelled, deadline > state.now else { return true }
                             state.suspensions.append(
                                 State.Entry(
                                     id: id,
