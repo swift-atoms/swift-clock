@@ -40,6 +40,21 @@ struct `Clock.Test` {
             task.cancel()
         }
     }
+
+    @MainActor
+    @Test
+    func `a sleep until now returns at once`() async throws {
+        let test = Clock.Test()
+        let ticks = Ticks()
+        let task = Task.immediate { @MainActor in
+            try await test.sleep(until: test.now)
+            ticks.count += 1
+        }
+        #expect(ticks.count == 1)
+        #expect(throws: Never.self) { try test.checkSuspension() }
+        task.cancel()
+        _ = await task.result
+    }
 }
 
 @MainActor
