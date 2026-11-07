@@ -13,7 +13,7 @@ struct `Clock.Test` {
         for _ in 0..<100 {
             let test = Clock.Test()
             let ticks = Ticks()
-            let task: Task<Void, any Error>
+            let task: Task<Void, any Swift.Error>
             switch reach {
             case .direct:
                 task = Task.immediate { @MainActor in

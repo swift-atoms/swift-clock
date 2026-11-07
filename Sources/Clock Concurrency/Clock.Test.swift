@@ -104,8 +104,6 @@
                         (continuation: CheckedContinuation<Void, Never>) in
                         let resumeImmediately = state.withLock { state -> Bool in
                             guard !Task.isCancelled, deadline > state.now else { return true }
-                            // `isolation!` is deliberate: the Swift 6.4.2 workaround in the doc comment above,
-                            // and the guard at the top of this method has already checked it is non-nil.
                             // swift-format-ignore: NeverForceUnwrap
                             state.suspensions.append(
                                 State.Entry(
