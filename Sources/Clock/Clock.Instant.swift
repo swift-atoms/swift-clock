@@ -1,5 +1,5 @@
-@_exported public import Tagged
-@_exported public import Time
+public import Tagged
+public import Time
 
 extension Clock {
 
