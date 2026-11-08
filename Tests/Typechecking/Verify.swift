@@ -1,6 +1,6 @@
 import Foundation
 
-struct VerificationFailure: Swift.Error, CustomStringConvertible {
+fileprivate struct VerificationFailure: Swift.Error, CustomStringConvertible {
     let description: String
 }
 
