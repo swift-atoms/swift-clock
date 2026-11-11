@@ -38,6 +38,8 @@ extension Clock.Nonsending {
     extension Swift.SuspendingClock: Clock.Nonsending {}
 #endif
 
+extension Clock.Hosted: Clock.Nonsending {}
+
 extension Clock.Immediate: Clock.Nonsending {}
 
 extension Clock.Unimplemented: Clock.Nonsending {}
