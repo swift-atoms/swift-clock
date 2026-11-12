@@ -1,6 +1,7 @@
 import Synchronization
 public import Tagged
 public import Time
+public import _Concurrency
 
 extension Clock {
     /// A clock whose time moves only when a test moves it, as Point-Free's `TestClock` (swift-clocks 2).

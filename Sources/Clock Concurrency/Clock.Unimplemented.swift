@@ -1,5 +1,6 @@
 public import Tagged
 public import Time
+public import _Concurrency
 
 extension Clock {
     public struct Unimplemented: _Concurrency.Clock, Sendable {
@@ -11,8 +12,6 @@ extension Clock.Unimplemented {
     public typealias Instant = Tagged<Self, Time.Instant>
 
     public var now: Instant { .init(Time.Instant(secondsSinceUnixEpoch: 0)) }
-
-    public var minimumResolution: Duration { .zero }
 
     nonisolated(nonsending)
         public func sleep(

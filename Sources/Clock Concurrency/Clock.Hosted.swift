@@ -1,5 +1,6 @@
 public import Tagged
 public import Time
+public import _Concurrency
 
 extension Clock {
 
@@ -29,13 +30,11 @@ extension Clock.Hosted {
         Instant(Time.Instant(secondsSinceUnixEpoch: 0)).advanced(by: elapsed())
     }
 
-    public var minimumResolution: Duration { .milliseconds(1) }
-
     nonisolated(nonsending)
         public func sleep(
             until deadline: Instant,
             tolerance: Duration? = nil
-        ) async throws
+        ) async throws(CancellationError)
     {
         if Task.isCancelled { throw CancellationError() }
         let delay = now.duration(to: deadline)

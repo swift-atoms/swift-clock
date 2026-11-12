@@ -1,3 +1,5 @@
+public import _Concurrency
+
 extension Clock {
     public struct `Any`<D: DurationProtocol & Hashable>: Clock.Nonsending, Sendable {
         public struct Instant: InstantProtocol, Sendable {

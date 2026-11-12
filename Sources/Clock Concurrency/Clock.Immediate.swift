@@ -1,6 +1,7 @@
 import Synchronization
 public import Tagged
 public import Time
+public import _Concurrency
 
 extension Clock {
     public final class Immediate: _Concurrency.Clock, Sendable {

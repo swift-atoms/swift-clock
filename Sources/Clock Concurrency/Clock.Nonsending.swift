@@ -1,3 +1,5 @@
+public import _Concurrency
+
 extension Clock {
     /// A clock that sleeps on the caller's actor rather than hopping off it.
     ///
@@ -37,6 +39,11 @@ extension Clock.Nonsending {
 
     extension Swift.SuspendingClock: Clock.Nonsending {}
 #endif
+
+extension Clock.Nonsending {
+    /// Zero: a clock that states no resolution of its own.
+    public var minimumResolution: Instant.Duration { .zero }
+}
 
 extension Clock.Hosted: Clock.Nonsending {}
 
