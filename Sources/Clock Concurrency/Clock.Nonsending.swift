@@ -11,7 +11,7 @@ extension Clock {
     /// The shape is Point-Free's `NonsendingClock` (swift-clocks 2), and its requirement is the one pitched for
     /// `_Concurrency.Clock` itself ("[pre-pitch] Nonisolated nonsending Clock protocol", Swift Forums, October
     /// 2026). When the standard library's `Clock` has it, this protocol goes.
-    public protocol Nonsending<Duration>: _Concurrency.Clock {
+    public protocol Nonsending<Duration>: _Concurrency::Clock {
         func sleep(
             until deadline: Instant,
             tolerance: Instant.Duration?,

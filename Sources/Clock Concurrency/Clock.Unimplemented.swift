@@ -3,7 +3,7 @@ public import Time
 public import _Concurrency
 
 extension Clock {
-    public struct Unimplemented: _Concurrency.Clock, Sendable {
+    public struct Unimplemented: _Concurrency::Clock, Sendable {
         public init() {}
     }
 }

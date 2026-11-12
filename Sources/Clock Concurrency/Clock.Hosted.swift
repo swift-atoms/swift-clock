@@ -9,7 +9,7 @@ extension Clock {
     /// For a program that runs on a host's event loop and has no clock of its own, such as one in a browser page.
     /// `elapsed` answers how long the host has been running; `schedule` asks the host to call a closure back after
     /// a duration. A sleep that is cancelled wakes when its timer fires, not before, and then throws.
-    public final class Hosted: _Concurrency.Clock, Sendable {
+    public final class Hosted: _Concurrency::Clock, Sendable {
         private let elapsed: @Sendable () -> Duration
         private let schedule: @Sendable (Duration, @escaping @Sendable () -> Void) -> Void
 

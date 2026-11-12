@@ -4,7 +4,7 @@ public import Time
 public import _Concurrency
 
 extension Clock {
-    public final class Immediate: _Concurrency.Clock, Sendable {
+    public final class Immediate: _Concurrency::Clock, Sendable {
         private let state: Mutex<State>
 
         public init(now: Instant = .init(Time.Instant(secondsSinceUnixEpoch: 0))) {
